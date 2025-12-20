@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft, Star, Bug, Puzzle, Blocks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useState } from 'react';
@@ -38,6 +38,27 @@ const games: Game[] = [
     description: 'Choose the right path with if/else!',
     icon: '🛤️',
     difficulty: 'medium'
+  },
+  {
+    id: 'bug-hunter',
+    title: 'Bug Hunter',
+    description: 'Find and fix the bug in the code!',
+    icon: '🐛',
+    difficulty: 'medium'
+  },
+  {
+    id: 'pattern-match',
+    title: 'Pattern Match',
+    description: 'Match the code to its output!',
+    icon: '🧩',
+    difficulty: 'easy'
+  },
+  {
+    id: 'block-builder',
+    title: 'Block Builder',
+    description: 'Build code with visual blocks!',
+    icon: '🧱',
+    difficulty: 'hard'
   }
 ];
 
@@ -108,17 +129,50 @@ interface GameScreenProps {
 }
 
 const GameScreen = ({ game, onBack }: GameScreenProps) => {
-  if (game.id === 'sequence-robot') {
-    return <SequenceGame onBack={onBack} />;
+  switch (game.id) {
+    case 'sequence-robot':
+      return <SequenceGame onBack={onBack} />;
+    case 'loop-patterns':
+      return <LoopGame onBack={onBack} />;
+    case 'if-else-path':
+      return <IfElseGame onBack={onBack} />;
+    case 'bug-hunter':
+      return <BugHunterGame onBack={onBack} />;
+    case 'pattern-match':
+      return <PatternMatchGame onBack={onBack} />;
+    case 'block-builder':
+      return <BlockBuilderGame onBack={onBack} />;
+    default:
+      return null;
   }
-  if (game.id === 'loop-patterns') {
-    return <LoopGame onBack={onBack} />;
-  }
-  if (game.id === 'if-else-path') {
-    return <IfElseGame onBack={onBack} />;
-  }
-  return null;
 };
+
+// Completion Screen Component
+const CompletionScreen = ({ 
+  onBack, 
+  stars, 
+  title, 
+  message 
+}: { 
+  onBack: () => void; 
+  stars: number; 
+  title: string; 
+  message: string;
+}) => (
+  <div className="min-h-screen p-6 flex flex-col items-center justify-center">
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      className="text-center"
+    >
+      <Mascot mood="celebrating" size="lg" />
+      <h2 className="text-3xl font-black text-foreground mt-6 mb-4">{title}</h2>
+      <StarDisplay count={stars} maxStars={3} size="lg" animated />
+      <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
+      <Button size="lg" onClick={onBack}>Back to Games</Button>
+    </motion.div>
+  </div>
+);
 
 // Sequence Game Component
 const SequenceGame = ({ onBack }: { onBack: () => void }) => {
@@ -150,21 +204,7 @@ const SequenceGame = ({ onBack }: { onBack: () => void }) => {
   };
 
   if (completed) {
-    return (
-      <div className="min-h-screen p-6 flex flex-col items-center justify-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-center"
-        >
-          <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Amazing! 🎉</h2>
-          <StarDisplay count={earned} maxStars={3} size="lg" animated />
-          <p className="text-xl text-muted-foreground mt-4 mb-8">You completed the sequence!</p>
-          <Button size="lg" onClick={onBack}>Back to Games</Button>
-        </motion.div>
-      </div>
-    );
+    return <CompletionScreen onBack={onBack} stars={earned} title="Amazing! 🎉" message="You completed the sequence!" />;
   }
 
   return (
@@ -244,21 +284,7 @@ const LoopGame = ({ onBack }: { onBack: () => void }) => {
   };
 
   if (completed) {
-    return (
-      <div className="min-h-screen p-6 flex flex-col items-center justify-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-center"
-        >
-          <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Perfect! 🎉</h2>
-          <StarDisplay count={earned} maxStars={3} size="lg" animated />
-          <p className="text-xl text-muted-foreground mt-4 mb-8">You understand loops!</p>
-          <Button size="lg" onClick={onBack}>Back to Games</Button>
-        </motion.div>
-      </div>
-    );
+    return <CompletionScreen onBack={onBack} stars={earned} title="Perfect! 🎉" message="You understand loops!" />;
   }
 
   return (
@@ -338,21 +364,7 @@ const IfElseGame = ({ onBack }: { onBack: () => void }) => {
   };
 
   if (completed) {
-    return (
-      <div className="min-h-screen p-6 flex flex-col items-center justify-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-center"
-        >
-          <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Great Job! 🎉</h2>
-          <StarDisplay count={earned} maxStars={3} size="lg" animated />
-          <p className="text-xl text-muted-foreground mt-4 mb-8">You understand conditions!</p>
-          <Button size="lg" onClick={onBack}>Back to Games</Button>
-        </motion.div>
-      </div>
-    );
+    return <CompletionScreen onBack={onBack} stars={earned} title="Great Job! 🎉" message="You understand conditions!" />;
   }
 
   return (
@@ -407,6 +419,352 @@ const IfElseGame = ({ onBack }: { onBack: () => void }) => {
 
         <Button size="lg" className="w-full" onClick={checkAnswer} disabled={!answer}>
           Check Answer ✓
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Bug Hunter Game Component
+const BugHunterGame = ({ onBack }: { onBack: () => void }) => {
+  const [selectedBug, setSelectedBug] = useState<number | null>(null);
+  const [completed, setCompleted] = useState(false);
+  const [earned, setEarned] = useState(0);
+  const [showHint, setShowHint] = useState(false);
+
+  const codeLines = [
+    { text: 'START program', hasBug: false },
+    { text: 'SET score = 0', hasBug: false },
+    { text: 'REPEAT 5 times:', hasBug: false },
+    { text: '  score = score + 10', hasBug: false },
+    { text: 'PRINT "Your score: " + socre', hasBug: true, bugType: 'typo' },
+    { text: 'END program', hasBug: false },
+  ];
+
+  const bugLineIndex = codeLines.findIndex(line => line.hasBug);
+
+  const checkAnswer = () => {
+    if (selectedBug === bugLineIndex) {
+      const stars = showHint ? 2 : 3;
+      setEarned(stars);
+      setCompleted(true);
+      completeGame('bug-hunter', stars);
+    }
+  };
+
+  if (completed) {
+    return <CompletionScreen onBack={onBack} stars={earned} title="Bug Squashed! 🐛" message="You found the bug!" />;
+  }
+
+  return (
+    <div className="min-h-screen p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-black text-foreground">🐛 Bug Hunter</h1>
+            <p className="text-muted-foreground">Find the line with the bug!</p>
+          </div>
+        </div>
+
+        <Card variant="game" className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Bug className="w-6 h-6 text-destructive" />
+              <p className="text-lg font-semibold">This program has a bug! Tap the wrong line.</p>
+            </div>
+            
+            <div className="bg-muted rounded-2xl p-4 font-mono text-base space-y-2">
+              {codeLines.map((line, index) => (
+                <motion.div
+                  key={index}
+                  className={`p-3 rounded-xl cursor-pointer transition-all ${
+                    selectedBug === index 
+                      ? 'bg-destructive/20 border-2 border-destructive' 
+                      : 'bg-card hover:bg-primary/10 border-2 border-transparent'
+                  }`}
+                  onClick={() => setSelectedBug(index)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="text-muted-foreground mr-3">{index + 1}.</span>
+                  <span className={line.hasBug ? 'text-foreground' : 'text-foreground'}>
+                    {line.text}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {showHint && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-warning/20 border-2 border-warning/30 rounded-2xl p-4 mb-6 text-center"
+          >
+            <p className="text-lg">💡 Hint: Look for a spelling mistake in a variable name!</p>
+          </motion.div>
+        )}
+
+        <div className="flex gap-4 mb-4">
+          {!showHint && (
+            <Button variant="outline" size="lg" className="flex-1" onClick={() => setShowHint(true)}>
+              💡 Get Hint
+            </Button>
+          )}
+          <Button size="lg" className="flex-1" onClick={checkAnswer} disabled={selectedBug === null}>
+            Check Answer ✓
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Pattern Match Game Component
+const PatternMatchGame = ({ onBack }: { onBack: () => void }) => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+  const [completed, setCompleted] = useState(false);
+
+  const questions = [
+    {
+      code: 'REPEAT 3 times:\n  Draw ⭐',
+      options: ['⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐'],
+      correct: 1
+    },
+    {
+      code: 'IF hungry:\n  Eat 🍕\nELSE:\n  Play 🎮',
+      scenario: "You are NOT hungry",
+      options: ['🍕', '🎮', '🍕🎮', 'Nothing'],
+      correct: 1
+    },
+    {
+      code: 'SET x = 2\nSET y = 3\nPRINT x + y',
+      options: ['23', '5', '6', 'xy'],
+      correct: 1
+    }
+  ];
+
+  const question = questions[currentQuestion];
+
+  const handleAnswer = () => {
+    if (selectedAnswer === question.correct) {
+      setScore(score + 1);
+    }
+    
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+    } else {
+      const finalScore = score + (selectedAnswer === question.correct ? 1 : 0);
+      const stars = finalScore === 3 ? 3 : finalScore === 2 ? 2 : 1;
+      completeGame('pattern-match', stars);
+      setCompleted(true);
+    }
+  };
+
+  if (completed) {
+    const finalScore = score + (selectedAnswer === question.correct ? 1 : 0);
+    const stars = finalScore === 3 ? 3 : finalScore === 2 ? 2 : 1;
+    return <CompletionScreen onBack={onBack} stars={stars} title="Pattern Pro! 🧩" message={`You got ${finalScore}/3 correct!`} />;
+  }
+
+  return (
+    <div className="min-h-screen p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-black text-foreground">🧩 Pattern Match</h1>
+            <p className="text-muted-foreground">Question {currentQuestion + 1} of {questions.length}</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <Puzzle className="w-5 h-5 text-primary" />
+            <span className="font-bold">{score}</span>
+          </div>
+        </div>
+
+        <Card variant="game" className="mb-6">
+          <CardContent className="p-6">
+            <p className="text-lg font-semibold mb-4">What does this code output?</p>
+            <div className="bg-muted rounded-2xl p-4 font-mono text-lg whitespace-pre-line mb-4">
+              {question.code}
+            </div>
+            {question.scenario && (
+              <div className="bg-accent/20 rounded-xl p-3 text-center">
+                <p className="font-semibold">Scenario: {question.scenario}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          {question.options.map((option, index) => (
+            <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant={selectedAnswer === index ? 'default' : 'outline'}
+                size="lg"
+                className="w-full h-20 text-2xl"
+                onClick={() => setSelectedAnswer(index)}
+              >
+                {option}
+              </Button>
+            </motion.div>
+          ))}
+        </div>
+
+        <Button size="lg" className="w-full" onClick={handleAnswer} disabled={selectedAnswer === null}>
+          {currentQuestion < questions.length - 1 ? 'Next →' : 'Finish'}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Block Builder Game Component
+const BlockBuilderGame = ({ onBack }: { onBack: () => void }) => {
+  const [placedBlocks, setPlacedBlocks] = useState<string[]>([]);
+  const [completed, setCompleted] = useState(false);
+  const [earned, setEarned] = useState(0);
+
+  const availableBlocks = [
+    { id: 'start', label: '🚀 START', color: 'bg-success' },
+    { id: 'move', label: '➡️ Move Forward', color: 'bg-primary' },
+    { id: 'turn', label: '↪️ Turn Right', color: 'bg-secondary' },
+    { id: 'repeat', label: '🔄 Repeat 2x', color: 'bg-accent' },
+    { id: 'end', label: '🏁 END', color: 'bg-warning' },
+  ];
+
+  const correctSequence = ['start', 'repeat', 'move', 'turn', 'end'];
+  const goal = "Help the robot walk in a square! It needs to move and turn twice.";
+
+  const addBlock = (blockId: string) => {
+    if (placedBlocks.length < 5) {
+      setPlacedBlocks([...placedBlocks, blockId]);
+    }
+  };
+
+  const removeBlock = (index: number) => {
+    setPlacedBlocks(placedBlocks.filter((_, i) => i !== index));
+  };
+
+  const checkSolution = () => {
+    // Check if the sequence is correct
+    const isCorrect = 
+      placedBlocks.length === correctSequence.length &&
+      placedBlocks.every((block, index) => block === correctSequence[index]);
+    
+    if (isCorrect) {
+      const stars = 3;
+      setEarned(stars);
+      setCompleted(true);
+      completeGame('block-builder', stars);
+    }
+  };
+
+  const clearBlocks = () => {
+    setPlacedBlocks([]);
+  };
+
+  if (completed) {
+    return <CompletionScreen onBack={onBack} stars={earned} title="Master Builder! 🧱" message="You built the perfect program!" />;
+  }
+
+  return (
+    <div className="min-h-screen p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-black text-foreground">🧱 Block Builder</h1>
+            <p className="text-muted-foreground">Build a program with blocks!</p>
+          </div>
+        </div>
+
+        {/* Goal */}
+        <Card variant="lesson" className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Blocks className="w-8 h-8 text-primary" />
+              <p className="text-lg font-semibold">{goal}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Program Area */}
+        <Card variant="game" className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center justify-between">
+              Your Program
+              <Button variant="ghost" size="sm" onClick={clearBlocks}>
+                Clear All
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="min-h-[200px] bg-muted/50 rounded-2xl p-4 border-2 border-dashed border-primary/30">
+              {placedBlocks.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Tap blocks below to add them here!
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {placedBlocks.map((blockId, index) => {
+                    const block = availableBlocks.find(b => b.id === blockId);
+                    return (
+                      <motion.div
+                        key={`${blockId}-${index}`}
+                        initial={{ scale: 0, x: -20 }}
+                        animate={{ scale: 1, x: 0 }}
+                        className={`${block?.color} text-card-foreground p-3 rounded-xl flex items-center justify-between cursor-pointer shadow-md`}
+                        onClick={() => removeBlock(index)}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <span className="font-bold">{block?.label}</span>
+                        <span className="text-sm opacity-70">tap to remove</span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Available Blocks */}
+        <div className="mb-6">
+          <p className="text-lg font-semibold mb-3">Available Blocks:</p>
+          <div className="grid grid-cols-2 gap-3">
+            {availableBlocks.map((block) => (
+              <motion.div
+                key={block.id}
+                className={`${block.color} text-card-foreground p-4 rounded-xl cursor-pointer shadow-md text-center font-bold`}
+                onClick={() => addBlock(block.id)}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {block.label}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <Button 
+          size="lg" 
+          className="w-full" 
+          onClick={checkSolution}
+          disabled={placedBlocks.length === 0}
+        >
+          Run Program ▶️
         </Button>
       </div>
     </div>
