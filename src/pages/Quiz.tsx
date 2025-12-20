@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { saveQuizScore } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
+import { playClick, playCorrect, playWrong, playStar, playGameComplete, initAudio } from '@/lib/sounds';
 
 interface Question {
   id: string;
@@ -87,6 +88,8 @@ const Quiz = () => {
 
   const handleAnswerSelect = (index: number) => {
     if (showResult) return;
+    initAudio();
+    playClick();
     setSelectedAnswer(index);
   };
 
@@ -96,11 +99,15 @@ const Quiz = () => {
     const newAnswers = [...answers, isCorrect];
     setAnswers(newAnswers);
     if (isCorrect) {
+      playCorrect();
       setScore(score + 1);
+    } else {
+      playWrong();
     }
   };
 
   const handleNext = () => {
+    playClick();
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -108,6 +115,10 @@ const Quiz = () => {
     } else {
       const finalScore = Math.round(((score + (isCorrect ? 1 : 0)) / questions.length) * 100);
       saveQuizScore('main-quiz', finalScore);
+      playGameComplete();
+      if (finalScore >= 60) {
+        setTimeout(() => playStar(), 300);
+      }
       setIsComplete(true);
     }
   };

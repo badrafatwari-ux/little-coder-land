@@ -6,6 +6,7 @@ import { Mascot } from '@/components/Mascot';
 import { StarDisplay } from '@/components/StarDisplay';
 import { LevelBadge } from '@/components/LevelSystem';
 import { getProgress } from '@/lib/progress';
+import { initAudio, playClick } from '@/lib/sounds';
 import { useEffect, useState } from 'react';
 
 const menuItems = [
@@ -120,7 +121,11 @@ const Index = () => {
                 variant={item.variant}
                 size="lg"
                 className="w-full h-24 flex-col gap-2 text-lg"
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+                  initAudio();
+                  playClick();
+                  navigate(item.path);
+                }}
               >
                 <item.icon className="w-8 h-8" />
                 {item.label}

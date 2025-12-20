@@ -16,6 +16,7 @@ import {
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { LevelBadge, GameLevelIndicator, LockedOverlay } from '@/components/LevelSystem';
+import { playClick, playCorrect, playWrong, playStar, playGameComplete, playLevelUp, playTap, initAudio } from '@/lib/sounds';
 
 interface Game {
   id: string;
@@ -82,6 +83,8 @@ const Play = () => {
 
   const handleGameSelect = (game: Game) => {
     if (!isGameUnlocked(game.id)) return;
+    initAudio();
+    playClick();
     const gameProgress = getGameLevel(game.id);
     setSelectedLevel(gameProgress.currentLevel);
     setSelectedGame(game);
@@ -263,7 +266,12 @@ const LevelSelectScreen = ({ game, gameProgress, onSelectLevel, onBack }: LevelS
                 <Card
                   variant={isCompleted ? 'success' : isUnlocked ? 'game' : 'default'}
                   className={`cursor-pointer ${!isUnlocked ? 'opacity-60' : ''}`}
-                  onClick={() => isUnlocked && onSelectLevel(levelNum)}
+                  onClick={() => {
+                    if (isUnlocked) {
+                      playTap();
+                      onSelectLevel(levelNum);
+                    }
+                  }}
                 >
                   <CardContent className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -401,6 +409,10 @@ const SequenceGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
       setEarned(stars);
       setCompleted(true);
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
+    } else {
+      playWrong();
     }
   };
 
@@ -517,6 +529,10 @@ const LoopGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
       setEarned(stars);
       setCompleted(true);
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
+    } else {
+      playWrong();
     }
   };
 
@@ -571,7 +587,10 @@ const LoopGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setLoopCount(Math.max(1, loopCount - 1))}
+            onClick={() => {
+              playTap();
+              setLoopCount(Math.max(1, loopCount - 1));
+            }}
           >
             -
           </Button>
@@ -579,7 +598,10 @@ const LoopGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setLoopCount(Math.min(10, loopCount + 1))}
+            onClick={() => {
+              playTap();
+              setLoopCount(Math.min(10, loopCount + 1));
+            }}
           >
             +
           </Button>
@@ -612,6 +634,10 @@ const IfElseGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
       setEarned(stars);
       setCompleted(true);
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
+    } else {
+      playWrong();
     }
   };
 
@@ -670,7 +696,10 @@ const IfElseGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
               variant={answer === option.id ? 'success' : 'outline'}
               size="lg"
               className="h-24 text-xl"
-              onClick={() => setAnswer(option.id)}
+              onClick={() => {
+                playTap();
+                setAnswer(option.id);
+              }}
             >
               {option.label}
             </Button>
@@ -735,6 +764,10 @@ const BugHunterGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
       setEarned(stars);
       setCompleted(true);
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
+    } else {
+      playWrong();
     }
   };
 
@@ -775,7 +808,10 @@ const BugHunterGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
                       ? 'bg-destructive/20 border-2 border-destructive' 
                       : 'bg-card hover:bg-primary/10 border-2 border-transparent'
                   }`}
-                  onClick={() => setSelectedBug(index)}
+                  onClick={() => {
+                    playTap();
+                    setSelectedBug(index);
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -841,6 +877,12 @@ const PatternMatchGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) =
     const isCorrect = selectedAnswer === question.correct;
     const newScore = isCorrect ? score + 1 : score;
     
+    if (isCorrect) {
+      playCorrect();
+    } else {
+      playWrong();
+    }
+    
     if (currentQuestion < currentLevelQuestions.length - 1) {
       if (isCorrect) setScore(newScore);
       setCurrentQuestion(currentQuestion + 1);
@@ -849,6 +891,8 @@ const PatternMatchGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) =
       const finalScore = newScore;
       const stars = finalScore === currentLevelQuestions.length ? 3 : finalScore >= 1 ? 2 : 1;
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
       setCompleted(true);
     }
   };
@@ -900,7 +944,10 @@ const PatternMatchGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) =
               variant={selectedAnswer === index ? 'default' : 'outline'}
               size="lg"
               className="h-20 text-2xl"
-              onClick={() => setSelectedAnswer(index)}
+              onClick={() => {
+                playTap();
+                setSelectedAnswer(index);
+              }}
             >
               {option}
             </Button>
@@ -959,11 +1006,13 @@ const BlockBuilderGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) =
 
   const addBlock = (blockId: string) => {
     if (placedBlocks.length < currentLevel.correct.length + 2) {
+      playTap();
       setPlacedBlocks([...placedBlocks, blockId]);
     }
   };
 
   const removeBlock = (index: number) => {
+    playTap();
     setPlacedBlocks(placedBlocks.filter((_, i) => i !== index));
   };
 
@@ -977,6 +1026,10 @@ const BlockBuilderGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) =
       setEarned(stars);
       setCompleted(true);
       completeGameLevel(gameId, level, stars);
+      playGameComplete();
+      setTimeout(() => playStar(), 300);
+    } else {
+      playWrong();
     }
   };
 
