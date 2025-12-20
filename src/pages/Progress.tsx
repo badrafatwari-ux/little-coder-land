@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Trophy, BookOpen, Gamepad2, Award } from 'lucide-react';
+import { ArrowLeft, Star, Trophy, BookOpen, Gamepad2, Award, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getProgress } from '@/lib/progress';
+import { getProgress, getXPProgress, XP_PER_LEVEL, MAX_PLAYER_LEVEL, GAME_UNLOCK_LEVELS } from '@/lib/progress';
 import { useEffect, useState } from 'react';
 import { Mascot } from '@/components/Mascot';
 import { StarDisplay } from '@/components/StarDisplay';
+import { LevelBadge } from '@/components/LevelSystem';
 
 interface Badge {
   id: string;
@@ -19,10 +20,16 @@ interface Badge {
 const Progress = () => {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(getProgress());
+  const xpProgress = getXPProgress();
 
   useEffect(() => {
     setProgress(getProgress());
   }, []);
+
+  // Count completed game levels
+  const totalGameLevels = Object.values(progress.gameLevels).reduce((acc, game) => {
+    return acc + game.starsEarned.filter(s => s > 0).length;
+  }, 0);
 
   const badges: Badge[] = [
     {
@@ -43,8 +50,8 @@ const Progress = () => {
       id: 'first-game',
       name: 'Player One',
       icon: '🎮',
-      description: 'Complete your first game',
-      unlocked: progress.completedGames.length >= 1
+      description: 'Complete your first game level',
+      unlocked: totalGameLevels >= 1
     },
     {
       id: 'quiz-master',
@@ -61,11 +68,25 @@ const Progress = () => {
       unlocked: progress.totalStars >= 20
     },
     {
+      id: 'level-5',
+      name: 'Rising Star',
+      icon: '🌟',
+      description: 'Reach Level 5',
+      unlocked: progress.playerLevel >= 5
+    },
+    {
+      id: 'all-unlocked',
+      name: 'Explorer',
+      icon: '🗺️',
+      description: 'Unlock all games',
+      unlocked: progress.playerLevel >= 4
+    },
+    {
       id: 'super-coder',
       name: 'Super Coder',
       icon: '💻',
-      description: 'Complete everything',
-      unlocked: progress.completedLessons.length >= 5 && progress.completedGames.length >= 3
+      description: 'Reach max level',
+      unlocked: progress.playerLevel >= MAX_PLAYER_LEVEL
     }
   ];
 
@@ -77,6 +98,12 @@ const Progress = () => {
   ];
 
   const randomMessage = motivationMessages[Math.floor(Math.random() * motivationMessages.length)];
+
+  // Games that will unlock at next levels
+  const upcomingUnlocks = Object.entries(GAME_UNLOCK_LEVELS)
+    .filter(([_, level]) => level > progress.playerLevel)
+    .sort((a, b) => a[1] - b[1])
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen p-6">
@@ -96,16 +123,82 @@ const Progress = () => {
           </div>
         </div>
 
-        {/* Mascot and motivation */}
-        <Card variant="success" className="mb-8">
-          <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
-            <Mascot mood="happy" size="md" />
-            <div className="text-center md:text-left">
-              <p className="text-2xl font-bold text-foreground mb-2">{randomMessage}</p>
-              <StarDisplay count={progress.stars} size="lg" />
+        {/* Level Progress Card */}
+        <Card variant="game" className="mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <Mascot mood={progress.playerLevel >= 5 ? 'celebrating' : 'happy'} size="md" />
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
+                  <LevelBadge level={progress.playerLevel} size="lg" />
+                  <div>
+                    <p className="text-2xl font-black text-foreground">Level {progress.playerLevel}</p>
+                    <p className="text-muted-foreground">{randomMessage}</p>
+                  </div>
+                </div>
+                
+                {/* XP Progress Bar */}
+                {progress.playerLevel < MAX_PLAYER_LEVEL ? (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-warning" />
+                        XP Progress
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {xpProgress.current} / {xpProgress.needed} XP
+                      </span>
+                    </div>
+                    <div className="h-4 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-primary to-accent"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${xpProgress.percent}%` }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {XP_PER_LEVEL - xpProgress.current} XP until Level {progress.playerLevel + 1}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-success/20 rounded-xl p-3 text-center">
+                    <p className="text-lg font-bold text-success">🎉 MAX LEVEL REACHED!</p>
+                  </div>
+                )}
+
+                <StarDisplay count={progress.stars} size="lg" />
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Upcoming Unlocks */}
+        {upcomingUnlocks.length > 0 && (
+          <Card variant="lesson" className="mb-8">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">🔓 Coming Soon</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                {upcomingUnlocks.map(([gameId, level]) => (
+                  <div
+                    key={gameId}
+                    className="bg-muted/50 px-4 py-2 rounded-xl flex items-center gap-2"
+                  >
+                    <span className="text-2xl">
+                      {gameId === 'bug-hunter' ? '🐛' : gameId === 'block-builder' ? '🧱' : '🎮'}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-sm">{gameId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</p>
+                      <p className="text-xs text-muted-foreground">Unlocks at Level {level}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4 mb-8">
@@ -127,8 +220,8 @@ const Progress = () => {
           >
             <Card className="text-center p-6">
               <Gamepad2 className="w-10 h-10 mx-auto text-secondary mb-2" />
-              <p className="text-3xl font-black text-foreground">{progress.completedGames.length}</p>
-              <p className="text-sm text-muted-foreground">Games</p>
+              <p className="text-3xl font-black text-foreground">{totalGameLevels}</p>
+              <p className="text-sm text-muted-foreground">Levels</p>
             </Card>
           </motion.div>
           <motion.div
@@ -153,7 +246,7 @@ const Progress = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {badges.map((badge, index) => (
                 <motion.div
                   key={badge.id}
@@ -169,7 +262,7 @@ const Progress = () => {
                   <span className={`text-4xl ${badge.unlocked ? '' : 'grayscale'}`}>
                     {badge.icon}
                   </span>
-                  <p className="font-bold mt-2">{badge.name}</p>
+                  <p className="font-bold mt-2 text-sm">{badge.name}</p>
                   <p className="text-xs text-muted-foreground">{badge.description}</p>
                   {badge.unlocked && (
                     <motion.div

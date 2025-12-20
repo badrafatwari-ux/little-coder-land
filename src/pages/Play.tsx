@@ -1,13 +1,21 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Bug, Puzzle, Blocks } from 'lucide-react';
+import { ArrowLeft, Star, Lock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
-import { completeGame } from '@/lib/progress';
+import { 
+  getProgress, 
+  getGameLevel, 
+  isGameUnlocked, 
+  completeGameLevel, 
+  GAME_UNLOCK_LEVELS, 
+  GAME_MAX_LEVELS 
+} from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
+import { LevelBadge, GameLevelIndicator, LockedOverlay } from '@/components/LevelSystem';
 
 interface Game {
   id: string;
@@ -23,6 +31,13 @@ const games: Game[] = [
     title: 'Robot Sequence',
     description: 'Put the steps in order to help the robot!',
     icon: '🤖',
+    difficulty: 'easy'
+  },
+  {
+    id: 'pattern-match',
+    title: 'Pattern Match',
+    description: 'Match the code to its output!',
+    icon: '🧩',
     difficulty: 'easy'
   },
   {
@@ -47,13 +62,6 @@ const games: Game[] = [
     difficulty: 'medium'
   },
   {
-    id: 'pattern-match',
-    title: 'Pattern Match',
-    description: 'Match the code to its output!',
-    icon: '🧩',
-    difficulty: 'easy'
-  },
-  {
     id: 'block-builder',
     title: 'Block Builder',
     description: 'Build code with visual blocks!',
@@ -65,9 +73,29 @@ const games: Game[] = [
 const Play = () => {
   const navigate = useNavigate();
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [progress, setProgress] = useState(getProgress());
+
+  useEffect(() => {
+    setProgress(getProgress());
+  }, [selectedGame]);
+
+  const handleGameSelect = (game: Game) => {
+    if (!isGameUnlocked(game.id)) return;
+    const gameProgress = getGameLevel(game.id);
+    setSelectedLevel(gameProgress.currentLevel);
+    setSelectedGame(game);
+  };
 
   if (selectedGame) {
-    return <GameScreen game={selectedGame} onBack={() => setSelectedGame(null)} />;
+    return (
+      <GameScreen 
+        game={selectedGame} 
+        level={selectedLevel}
+        onBack={() => setSelectedGame(null)} 
+        onLevelChange={setSelectedLevel}
+      />
+    );
   }
 
   return (
@@ -78,45 +106,66 @@ const Play = () => {
         animate={{ opacity: 1 }}
       >
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-black text-foreground">Play Games</h1>
-            <p className="text-muted-foreground">Practice coding with fun puzzles! 🎮</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-black text-foreground">Play Games</h1>
+              <p className="text-muted-foreground">Complete levels to unlock more! 🎮</p>
+            </div>
           </div>
+          <LevelBadge level={progress.playerLevel} showXP />
         </div>
 
         {/* Games Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {games.map((game, index) => (
-            <motion.div
-              key={game.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card
-                variant="game"
-                className="cursor-pointer h-full"
-                onClick={() => setSelectedGame(game)}
+          {games.map((game, index) => {
+            const unlocked = isGameUnlocked(game.id);
+            const gameProgress = getGameLevel(game.id);
+            const requiredLevel = GAME_UNLOCK_LEVELS[game.id] || 1;
+            
+            return (
+              <motion.div
+                key={game.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <CardHeader>
-                  <span className="text-5xl mb-2">{game.icon}</span>
-                  <CardTitle className="text-xl">{game.title}</CardTitle>
-                  <CardDescription>{game.description}</CardDescription>
-                  <div className={`inline-flex px-3 py-1 rounded-full text-sm font-semibold mt-2 ${
-                    game.difficulty === 'easy' ? 'bg-success/20 text-success' :
-                    game.difficulty === 'medium' ? 'bg-warning/20 text-warning' :
-                    'bg-destructive/20 text-destructive'
-                  }`}>
-                    {game.difficulty.charAt(0).toUpperCase() + game.difficulty.slice(1)}
-                  </div>
-                </CardHeader>
-              </Card>
-            </motion.div>
-          ))}
+                <Card
+                  variant="game"
+                  className={`cursor-pointer h-full relative overflow-hidden ${!unlocked ? 'opacity-80' : ''}`}
+                  onClick={() => handleGameSelect(game)}
+                >
+                  {!unlocked && (
+                    <LockedOverlay requiredLevel={requiredLevel} currentLevel={progress.playerLevel} />
+                  )}
+                  <CardHeader>
+                    <span className="text-5xl mb-2">{game.icon}</span>
+                    <CardTitle className="text-xl">{game.title}</CardTitle>
+                    <CardDescription>{game.description}</CardDescription>
+                    
+                    {unlocked && (
+                      <GameLevelIndicator
+                        currentLevel={gameProgress.currentLevel}
+                        maxLevel={gameProgress.maxLevel}
+                        starsEarned={gameProgress.starsEarned}
+                      />
+                    )}
+                    
+                    <div className={`inline-flex px-3 py-1 rounded-full text-sm font-semibold mt-2 ${
+                      game.difficulty === 'easy' ? 'bg-success/20 text-success' :
+                      game.difficulty === 'medium' ? 'bg-warning/20 text-warning' :
+                      'bg-destructive/20 text-destructive'
+                    }`}>
+                      {game.difficulty.charAt(0).toUpperCase() + game.difficulty.slice(1)}
+                    </div>
+                  </CardHeader>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       </motion.div>
     </div>
@@ -125,39 +174,162 @@ const Play = () => {
 
 interface GameScreenProps {
   game: Game;
+  level: number;
   onBack: () => void;
+  onLevelChange: (level: number) => void;
 }
 
-const GameScreen = ({ game, onBack }: GameScreenProps) => {
+const GameScreen = ({ game, level, onBack, onLevelChange }: GameScreenProps) => {
+  const [showLevelSelect, setShowLevelSelect] = useState(false);
+  const gameProgress = getGameLevel(game.id);
+
+  if (showLevelSelect) {
+    return (
+      <LevelSelectScreen
+        game={game}
+        gameProgress={gameProgress}
+        onSelectLevel={(lvl) => {
+          onLevelChange(lvl);
+          setShowLevelSelect(false);
+        }}
+        onBack={onBack}
+      />
+    );
+  }
+
+  const gameProps = { 
+    onBack, 
+    level, 
+    onLevelSelect: () => setShowLevelSelect(true),
+    gameId: game.id
+  };
+
   switch (game.id) {
     case 'sequence-robot':
-      return <SequenceGame onBack={onBack} />;
+      return <SequenceGame {...gameProps} />;
     case 'loop-patterns':
-      return <LoopGame onBack={onBack} />;
+      return <LoopGame {...gameProps} />;
     case 'if-else-path':
-      return <IfElseGame onBack={onBack} />;
+      return <IfElseGame {...gameProps} />;
     case 'bug-hunter':
-      return <BugHunterGame onBack={onBack} />;
+      return <BugHunterGame {...gameProps} />;
     case 'pattern-match':
-      return <PatternMatchGame onBack={onBack} />;
+      return <PatternMatchGame {...gameProps} />;
     case 'block-builder':
-      return <BlockBuilderGame onBack={onBack} />;
+      return <BlockBuilderGame {...gameProps} />;
     default:
       return null;
   }
 };
+
+interface LevelSelectScreenProps {
+  game: Game;
+  gameProgress: ReturnType<typeof getGameLevel>;
+  onSelectLevel: (level: number) => void;
+  onBack: () => void;
+}
+
+const LevelSelectScreen = ({ game, gameProgress, onSelectLevel, onBack }: LevelSelectScreenProps) => {
+  return (
+    <div className="min-h-screen p-6">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{game.icon}</span>
+            <div>
+              <h1 className="text-2xl font-black text-foreground">{game.title}</h1>
+              <p className="text-muted-foreground">Choose a level</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-4">
+          {Array.from({ length: gameProgress.maxLevel }).map((_, index) => {
+            const levelNum = index + 1;
+            const isUnlocked = levelNum <= gameProgress.currentLevel;
+            const stars = gameProgress.starsEarned[index] || 0;
+            const isCompleted = stars > 0;
+
+            return (
+              <motion.div
+                key={levelNum}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card
+                  variant={isCompleted ? 'success' : isUnlocked ? 'game' : 'default'}
+                  className={`cursor-pointer ${!isUnlocked ? 'opacity-60' : ''}`}
+                  onClick={() => isUnlocked && onSelectLevel(levelNum)}
+                >
+                  <CardContent className="p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black ${
+                        isCompleted ? 'bg-success text-success-foreground' :
+                        isUnlocked ? 'bg-primary text-primary-foreground' :
+                        'bg-muted text-muted-foreground'
+                      }`}>
+                        {isUnlocked ? levelNum : <Lock className="w-6 h-6" />}
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold">Level {levelNum}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {levelNum === 1 ? 'Easy' : levelNum === 2 ? 'Medium' : 'Hard'} difficulty
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {isUnlocked && (
+                        <div className="flex gap-1">
+                          {[1, 2, 3].map(s => (
+                            <Star
+                              key={s}
+                              className={`w-6 h-6 ${
+                                s <= stars ? 'text-warning fill-warning' : 'text-muted-foreground/30'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      {isUnlocked && <ChevronRight className="w-6 h-6 text-muted-foreground" />}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Shared Game Props
+interface GameProps {
+  onBack: () => void;
+  level: number;
+  onLevelSelect: () => void;
+  gameId: string;
+}
 
 // Completion Screen Component
 const CompletionScreen = ({ 
   onBack, 
   stars, 
   title, 
-  message 
+  message,
+  onNextLevel,
+  hasNextLevel
 }: { 
   onBack: () => void; 
   stars: number; 
   title: string; 
   message: string;
+  onNextLevel?: () => void;
+  hasNextLevel?: boolean;
 }) => (
   <div className="min-h-screen p-6 flex flex-col items-center justify-center">
     <motion.div
@@ -169,25 +341,66 @@ const CompletionScreen = ({
       <h2 className="text-3xl font-black text-foreground mt-6 mb-4">{title}</h2>
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
-      <Button size="lg" onClick={onBack}>Back to Games</Button>
+      <div className="flex gap-4 justify-center">
+        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        {hasNextLevel && onNextLevel && (
+          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+        )}
+      </div>
     </motion.div>
   </div>
 );
 
+// Game Header Component
+const GameHeader = ({ 
+  title, 
+  subtitle, 
+  level, 
+  onBack, 
+  onLevelSelect 
+}: { 
+  title: string; 
+  subtitle: string; 
+  level: number;
+  onBack: () => void;
+  onLevelSelect: () => void;
+}) => (
+  <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center gap-4">
+      <Button variant="ghost" size="icon" onClick={onBack}>
+        <ArrowLeft className="w-6 h-6" />
+      </Button>
+      <div>
+        <h1 className="text-2xl font-black text-foreground">{title}</h1>
+        <p className="text-muted-foreground">{subtitle}</p>
+      </div>
+    </div>
+    <Button variant="outline" size="sm" onClick={onLevelSelect}>
+      Level {level}
+    </Button>
+  </div>
+);
+
 // Sequence Game Component
-const SequenceGame = ({ onBack }: { onBack: () => void }) => {
-  const correctOrder = ['Start', 'Walk Forward', 'Turn Right', 'Pick Up Item', 'End'];
-  const [items, setItems] = useState(['Pick Up Item', 'Turn Right', 'Walk Forward', 'End', 'Start']);
+const SequenceGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    { correct: ['Start', 'Walk Forward', 'End'], initial: ['End', 'Walk Forward', 'Start'] },
+    { correct: ['Start', 'Walk Forward', 'Turn Right', 'Pick Up Item', 'End'], initial: ['Pick Up Item', 'Turn Right', 'Walk Forward', 'End', 'Start'] },
+    { correct: ['Start', 'Walk Forward', 'Turn Left', 'Jump', 'Pick Up Key', 'Open Door', 'End'], initial: ['Open Door', 'Jump', 'Walk Forward', 'End', 'Pick Up Key', 'Turn Left', 'Start'] },
+  ];
+  
+  const currentLevelData = levelData[Math.min(level - 1, levelData.length - 1)];
+  const [items, setItems] = useState(currentLevelData.initial);
   const [completed, setCompleted] = useState(false);
   const [earned, setEarned] = useState(0);
 
   const checkOrder = () => {
-    const isCorrect = items.every((item, index) => item === correctOrder[index]);
+    const isCorrect = items.every((item, index) => item === currentLevelData.correct[index]);
     if (isCorrect) {
       const stars = 3;
       setEarned(stars);
       setCompleted(true);
-      completeGame('sequence-robot', stars);
+      completeGameLevel(gameId, level, stars);
     }
   };
 
@@ -203,22 +416,40 @@ const SequenceGame = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
+  const handleNextLevel = () => {
+    const gameProgress = getGameLevel(gameId);
+    if (level < gameProgress.maxLevel) {
+      const nextLevelData = levelData[level];
+      setItems(nextLevelData.initial);
+      setCompleted(false);
+      setEarned(0);
+    }
+  };
+
   if (completed) {
-    return <CompletionScreen onBack={onBack} stars={earned} title="Amazing! 🎉" message="You completed the sequence!" />;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={earned} 
+        title="Amazing! 🎉" 
+        message={`Level ${level} complete!`}
+        hasNextLevel={level < gameProgress.maxLevel}
+        onNextLevel={handleNextLevel}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-black text-foreground">🤖 Robot Sequence</h1>
-            <p className="text-muted-foreground">Drag the steps into the correct order!</p>
-          </div>
-        </div>
+        <GameHeader
+          title="🤖 Robot Sequence"
+          subtitle="Drag the steps into the correct order!"
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
         <DndContext onDragEnd={handleDragEnd}>
           <div className="space-y-3 mb-8">
@@ -268,56 +499,70 @@ const DraggableItem = ({ id, index }: { id: string; index: number }) => {
 };
 
 // Loop Game Component
-const LoopGame = ({ onBack }: { onBack: () => void }) => {
+const LoopGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    { target: 3, emoji: '⭐' },
+    { target: 5, emoji: '🌙' },
+    { target: 7, emoji: '❤️' },
+  ];
+  
+  const currentLevel = levelData[Math.min(level - 1, levelData.length - 1)];
   const [loopCount, setLoopCount] = useState(1);
   const [completed, setCompleted] = useState(false);
   const [earned, setEarned] = useState(0);
-  const targetCount = 4;
 
   const checkAnswer = () => {
-    if (loopCount === targetCount) {
+    if (loopCount === currentLevel.target) {
       const stars = 3;
       setEarned(stars);
       setCompleted(true);
-      completeGame('loop-patterns', stars);
+      completeGameLevel(gameId, level, stars);
     }
   };
 
   if (completed) {
-    return <CompletionScreen onBack={onBack} stars={earned} title="Perfect! 🎉" message="You understand loops!" />;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={earned} 
+        title="Perfect! 🎉" 
+        message="You understand loops!"
+        hasNextLevel={level < gameProgress.maxLevel}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-black text-foreground">🔄 Loop Patterns</h1>
-            <p className="text-muted-foreground">How many stars do we need to draw?</p>
-          </div>
-        </div>
+        <GameHeader
+          title="🔄 Loop Patterns"
+          subtitle="How many items do we need?"
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
         <Card variant="game" className="mb-8">
           <CardContent className="p-8">
             <p className="text-xl mb-6 text-center">Draw this pattern:</p>
-            <div className="flex justify-center gap-2 mb-8">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <motion.div
+            <div className="flex justify-center gap-2 mb-8 flex-wrap">
+              {Array.from({ length: currentLevel.target }).map((_, i) => (
+                <motion.span
                   key={i}
+                  className="text-4xl"
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: i * 0.2 }}
+                  transition={{ delay: i * 0.15 }}
                 >
-                  <Star className="w-12 h-12 text-warning fill-warning" />
-                </motion.div>
+                  {currentLevel.emoji}
+                </motion.span>
               ))}
             </div>
             <div className="bg-muted p-4 rounded-2xl text-center">
               <p className="text-lg font-mono mb-4">REPEAT <span className="text-primary font-bold">{loopCount}</span> times:</p>
-              <p className="text-lg">Draw ⭐</p>
+              <p className="text-lg">Draw {currentLevel.emoji}</p>
             </div>
           </CardContent>
         </Card>
@@ -349,72 +594,87 @@ const LoopGame = ({ onBack }: { onBack: () => void }) => {
 };
 
 // If/Else Game Component
-const IfElseGame = ({ onBack }: { onBack: () => void }) => {
-  const [answer, setAnswer] = useState<'sunny' | 'rainy' | null>(null);
+const IfElseGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    { condition: 'sunny', weather: '☀️', correct: 'sunny', options: [{ id: 'sunny', label: '🕶️ Sunglasses' }, { id: 'rainy', label: '☂️ Umbrella' }] },
+    { condition: 'cold', weather: '❄️', correct: 'cold', options: [{ id: 'cold', label: '🧥 Coat' }, { id: 'hot', label: '👕 T-Shirt' }] },
+    { condition: 'night', weather: '🌙', correct: 'night', options: [{ id: 'night', label: '🛏️ Sleep' }, { id: 'day', label: '⚽ Play' }, { id: 'eat', label: '🍕 Eat' }] },
+  ];
+
+  const currentLevel = levelData[Math.min(level - 1, levelData.length - 1)];
+  const [answer, setAnswer] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const [earned, setEarned] = useState(0);
 
   const checkAnswer = () => {
-    if (answer === 'sunny') {
+    if (answer === currentLevel.correct) {
       const stars = 3;
       setEarned(stars);
       setCompleted(true);
-      completeGame('if-else-path', stars);
+      completeGameLevel(gameId, level, stars);
     }
   };
 
   if (completed) {
-    return <CompletionScreen onBack={onBack} stars={earned} title="Great Job! 🎉" message="You understand conditions!" />;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={earned} 
+        title="Great Job! 🎉" 
+        message="You understand conditions!"
+        hasNextLevel={level < gameProgress.maxLevel}
+      />
+    );
   }
+
+  const conditionText = {
+    sunny: 'SUNNY',
+    cold: 'COLD',
+    night: 'NIGHT TIME',
+  }[currentLevel.condition] || currentLevel.condition.toUpperCase();
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-black text-foreground">🛤️ Decision Path</h1>
-            <p className="text-muted-foreground">Choose what happens!</p>
-          </div>
-        </div>
+        <GameHeader
+          title="🛤️ Decision Path"
+          subtitle="Choose what happens!"
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
         <Card variant="game" className="mb-8">
           <CardContent className="p-8">
             <div className="text-center mb-6">
-              <span className="text-6xl">☀️</span>
-              <p className="text-xl mt-4">The weather is <strong>SUNNY</strong>!</p>
+              <span className="text-6xl">{currentLevel.weather}</span>
+              <p className="text-xl mt-4">It is <strong>{conditionText}</strong>!</p>
             </div>
             
             <div className="bg-muted p-4 rounded-2xl font-mono text-lg">
-              <p>IF weather is sunny:</p>
-              <p className="ml-4 text-success">→ Wear sunglasses 🕶️</p>
+              <p>IF it is {conditionText.toLowerCase()}:</p>
+              <p className="ml-4 text-success">→ {currentLevel.options[0].label}</p>
               <p>ELSE:</p>
-              <p className="ml-4 text-primary">→ Take umbrella ☂️</p>
+              <p className="ml-4 text-primary">→ {currentLevel.options[1].label}</p>
             </div>
           </CardContent>
         </Card>
 
         <p className="text-xl text-center mb-4 font-semibold">What should you do?</p>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Button
-            variant={answer === 'sunny' ? 'success' : 'outline'}
-            size="lg"
-            className="h-24 text-xl"
-            onClick={() => setAnswer('sunny')}
-          >
-            🕶️ Sunglasses
-          </Button>
-          <Button
-            variant={answer === 'rainy' ? 'accent' : 'outline'}
-            size="lg"
-            className="h-24 text-xl"
-            onClick={() => setAnswer('rainy')}
-          >
-            ☂️ Umbrella
-          </Button>
+        <div className={`grid gap-4 mb-8 ${currentLevel.options.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {currentLevel.options.map((option) => (
+            <Button
+              key={option.id}
+              variant={answer === option.id ? 'success' : 'outline'}
+              size="lg"
+              className="h-24 text-xl"
+              onClick={() => setAnswer(option.id)}
+            >
+              {option.label}
+            </Button>
+          ))}
         </div>
 
         <Button size="lg" className="w-full" onClick={checkAnswer} disabled={!answer}>
@@ -426,58 +686,88 @@ const IfElseGame = ({ onBack }: { onBack: () => void }) => {
 };
 
 // Bug Hunter Game Component
-const BugHunterGame = ({ onBack }: { onBack: () => void }) => {
+const BugHunterGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    {
+      lines: [
+        { text: 'START program', hasBug: false },
+        { text: 'SET score = 0', hasBug: false },
+        { text: 'PRINT "Score: " + socre', hasBug: true },
+        { text: 'END program', hasBug: false },
+      ],
+      hint: 'Look for a spelling mistake!'
+    },
+    {
+      lines: [
+        { text: 'START program', hasBug: false },
+        { text: 'SET x = 5', hasBug: false },
+        { text: 'SET y = 10', hasBug: false },
+        { text: 'PRINT x + y + z', hasBug: true },
+        { text: 'END program', hasBug: false },
+      ],
+      hint: 'Is every variable defined?'
+    },
+    {
+      lines: [
+        { text: 'START program', hasBug: false },
+        { text: 'REPEAT 3 times:', hasBug: false },
+        { text: '  Draw star', hasBug: false },
+        { text: '  Move forward', hasBug: false },
+        { text: 'REPEAT 2 times', hasBug: true },
+        { text: '  Draw circle', hasBug: false },
+        { text: 'END program', hasBug: false },
+      ],
+      hint: 'Check if all loops have colons!'
+    },
+  ];
+
+  const currentLevel = levelData[Math.min(level - 1, levelData.length - 1)];
   const [selectedBug, setSelectedBug] = useState<number | null>(null);
   const [completed, setCompleted] = useState(false);
   const [earned, setEarned] = useState(0);
   const [showHint, setShowHint] = useState(false);
 
-  const codeLines = [
-    { text: 'START program', hasBug: false },
-    { text: 'SET score = 0', hasBug: false },
-    { text: 'REPEAT 5 times:', hasBug: false },
-    { text: '  score = score + 10', hasBug: false },
-    { text: 'PRINT "Your score: " + socre', hasBug: true, bugType: 'typo' },
-    { text: 'END program', hasBug: false },
-  ];
-
-  const bugLineIndex = codeLines.findIndex(line => line.hasBug);
+  const bugLineIndex = currentLevel.lines.findIndex(line => line.hasBug);
 
   const checkAnswer = () => {
     if (selectedBug === bugLineIndex) {
       const stars = showHint ? 2 : 3;
       setEarned(stars);
       setCompleted(true);
-      completeGame('bug-hunter', stars);
+      completeGameLevel(gameId, level, stars);
     }
   };
 
   if (completed) {
-    return <CompletionScreen onBack={onBack} stars={earned} title="Bug Squashed! 🐛" message="You found the bug!" />;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={earned} 
+        title="Bug Squashed! 🐛" 
+        message="You found the bug!"
+        hasNextLevel={level < gameProgress.maxLevel}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-black text-foreground">🐛 Bug Hunter</h1>
-            <p className="text-muted-foreground">Find the line with the bug!</p>
-          </div>
-        </div>
+        <GameHeader
+          title="🐛 Bug Hunter"
+          subtitle="Find the line with the bug!"
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
         <Card variant="game" className="mb-6">
           <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Bug className="w-6 h-6 text-destructive" />
-              <p className="text-lg font-semibold">This program has a bug! Tap the wrong line.</p>
-            </div>
+            <p className="text-lg font-semibold mb-4">Tap the line with the bug:</p>
             
             <div className="bg-muted rounded-2xl p-4 font-mono text-base space-y-2">
-              {codeLines.map((line, index) => (
+              {currentLevel.lines.map((line, index) => (
                 <motion.div
                   key={index}
                   className={`p-3 rounded-xl cursor-pointer transition-all ${
@@ -490,9 +780,7 @@ const BugHunterGame = ({ onBack }: { onBack: () => void }) => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <span className="text-muted-foreground mr-3">{index + 1}.</span>
-                  <span className={line.hasBug ? 'text-foreground' : 'text-foreground'}>
-                    {line.text}
-                  </span>
+                  <span>{line.text}</span>
                 </motion.div>
               ))}
             </div>
@@ -505,18 +793,18 @@ const BugHunterGame = ({ onBack }: { onBack: () => void }) => {
             animate={{ opacity: 1, y: 0 }}
             className="bg-warning/20 border-2 border-warning/30 rounded-2xl p-4 mb-6 text-center"
           >
-            <p className="text-lg">💡 Hint: Look for a spelling mistake in a variable name!</p>
+            <p className="text-lg">💡 Hint: {currentLevel.hint}</p>
           </motion.div>
         )}
 
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-4">
           {!showHint && (
             <Button variant="outline" size="lg" className="flex-1" onClick={() => setShowHint(true)}>
-              💡 Get Hint
+              💡 Hint
             </Button>
           )}
           <Button size="lg" className="flex-1" onClick={checkAnswer} disabled={selectedBug === null}>
-            Check Answer ✓
+            Check ✓
           </Button>
         </div>
       </div>
@@ -525,71 +813,71 @@ const BugHunterGame = ({ onBack }: { onBack: () => void }) => {
 };
 
 // Pattern Match Game Component
-const PatternMatchGame = ({ onBack }: { onBack: () => void }) => {
+const PatternMatchGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    [
+      { code: 'REPEAT 3 times:\n  Draw ⭐', options: ['⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐'], correct: 1 },
+      { code: 'REPEAT 2 times:\n  Draw 🌙', options: ['🌙', '🌙🌙', '🌙🌙🌙'], correct: 1 },
+    ],
+    [
+      { code: 'IF hungry:\n  Eat 🍕\nELSE:\n  Play 🎮', scenario: 'NOT hungry', options: ['🍕', '🎮', '🍕🎮'], correct: 1 },
+      { code: 'SET x = 2\nSET y = 3\nPRINT x + y', options: ['23', '5', '6'], correct: 1 },
+    ],
+    [
+      { code: 'SET count = 0\nREPEAT 4 times:\n  count = count + 2\nPRINT count', options: ['4', '6', '8'], correct: 2 },
+      { code: 'IF score > 10:\n  PRINT "Win!"\nELSE:\n  PRINT "Try again"', scenario: 'score = 15', options: ['Win!', 'Try again', 'Error'], correct: 0 },
+    ],
+  ];
+
+  const currentLevelQuestions = levelData[Math.min(level - 1, levelData.length - 1)];
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  const questions = [
-    {
-      code: 'REPEAT 3 times:\n  Draw ⭐',
-      options: ['⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐'],
-      correct: 1
-    },
-    {
-      code: 'IF hungry:\n  Eat 🍕\nELSE:\n  Play 🎮',
-      scenario: "You are NOT hungry",
-      options: ['🍕', '🎮', '🍕🎮', 'Nothing'],
-      correct: 1
-    },
-    {
-      code: 'SET x = 2\nSET y = 3\nPRINT x + y',
-      options: ['23', '5', '6', 'xy'],
-      correct: 1
-    }
-  ];
-
-  const question = questions[currentQuestion];
+  const question = currentLevelQuestions[currentQuestion];
 
   const handleAnswer = () => {
-    if (selectedAnswer === question.correct) {
-      setScore(score + 1);
-    }
+    const isCorrect = selectedAnswer === question.correct;
+    const newScore = isCorrect ? score + 1 : score;
     
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < currentLevelQuestions.length - 1) {
+      if (isCorrect) setScore(newScore);
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
     } else {
-      const finalScore = score + (selectedAnswer === question.correct ? 1 : 0);
-      const stars = finalScore === 3 ? 3 : finalScore === 2 ? 2 : 1;
-      completeGame('pattern-match', stars);
+      const finalScore = newScore;
+      const stars = finalScore === currentLevelQuestions.length ? 3 : finalScore >= 1 ? 2 : 1;
+      completeGameLevel(gameId, level, stars);
       setCompleted(true);
     }
   };
 
   if (completed) {
     const finalScore = score + (selectedAnswer === question.correct ? 1 : 0);
-    const stars = finalScore === 3 ? 3 : finalScore === 2 ? 2 : 1;
-    return <CompletionScreen onBack={onBack} stars={stars} title="Pattern Pro! 🧩" message={`You got ${finalScore}/3 correct!`} />;
+    const stars = finalScore === currentLevelQuestions.length ? 3 : finalScore >= 1 ? 2 : 1;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={stars} 
+        title="Pattern Pro! 🧩" 
+        message={`${finalScore}/${currentLevelQuestions.length} correct!`}
+        hasNextLevel={level < gameProgress.maxLevel}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-black text-foreground">🧩 Pattern Match</h1>
-            <p className="text-muted-foreground">Question {currentQuestion + 1} of {questions.length}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <Puzzle className="w-5 h-5 text-primary" />
-            <span className="font-bold">{score}</span>
-          </div>
-        </div>
+        <GameHeader
+          title="🧩 Pattern Match"
+          subtitle={`Question ${currentQuestion + 1}/${currentLevelQuestions.length}`}
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
         <Card variant="game" className="mb-6">
           <CardContent className="p-6">
@@ -605,23 +893,22 @@ const PatternMatchGame = ({ onBack }: { onBack: () => void }) => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           {question.options.map((option, index) => (
-            <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant={selectedAnswer === index ? 'default' : 'outline'}
-                size="lg"
-                className="w-full h-20 text-2xl"
-                onClick={() => setSelectedAnswer(index)}
-              >
-                {option}
-              </Button>
-            </motion.div>
+            <Button
+              key={index}
+              variant={selectedAnswer === index ? 'default' : 'outline'}
+              size="lg"
+              className="h-20 text-2xl"
+              onClick={() => setSelectedAnswer(index)}
+            >
+              {option}
+            </Button>
           ))}
         </div>
 
         <Button size="lg" className="w-full" onClick={handleAnswer} disabled={selectedAnswer === null}>
-          {currentQuestion < questions.length - 1 ? 'Next →' : 'Finish'}
+          {currentQuestion < currentLevelQuestions.length - 1 ? 'Next →' : 'Finish'}
         </Button>
       </div>
     </div>
@@ -629,24 +916,49 @@ const PatternMatchGame = ({ onBack }: { onBack: () => void }) => {
 };
 
 // Block Builder Game Component
-const BlockBuilderGame = ({ onBack }: { onBack: () => void }) => {
+const BlockBuilderGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const levelData = [
+    {
+      goal: 'Make the robot walk forward and stop.',
+      correct: ['start', 'move', 'end'],
+      blocks: [
+        { id: 'start', label: '🚀 START', color: 'bg-success' },
+        { id: 'move', label: '➡️ Move', color: 'bg-primary' },
+        { id: 'end', label: '🏁 END', color: 'bg-warning' },
+      ]
+    },
+    {
+      goal: 'Make the robot walk in a square (move + turn, twice).',
+      correct: ['start', 'repeat', 'move', 'turn', 'end'],
+      blocks: [
+        { id: 'start', label: '🚀 START', color: 'bg-success' },
+        { id: 'move', label: '➡️ Move', color: 'bg-primary' },
+        { id: 'turn', label: '↪️ Turn', color: 'bg-secondary' },
+        { id: 'repeat', label: '🔄 Repeat 2x', color: 'bg-accent' },
+        { id: 'end', label: '🏁 END', color: 'bg-warning' },
+      ]
+    },
+    {
+      goal: 'If there\'s a wall, turn. Otherwise move forward. Then stop.',
+      correct: ['start', 'if-wall', 'turn', 'else', 'move', 'end'],
+      blocks: [
+        { id: 'start', label: '🚀 START', color: 'bg-success' },
+        { id: 'if-wall', label: '❓ IF wall', color: 'bg-accent' },
+        { id: 'turn', label: '↪️ Turn', color: 'bg-secondary' },
+        { id: 'else', label: '➡️ ELSE', color: 'bg-accent' },
+        { id: 'move', label: '🚶 Move', color: 'bg-primary' },
+        { id: 'end', label: '🏁 END', color: 'bg-warning' },
+      ]
+    },
+  ];
+
+  const currentLevel = levelData[Math.min(level - 1, levelData.length - 1)];
   const [placedBlocks, setPlacedBlocks] = useState<string[]>([]);
   const [completed, setCompleted] = useState(false);
   const [earned, setEarned] = useState(0);
 
-  const availableBlocks = [
-    { id: 'start', label: '🚀 START', color: 'bg-success' },
-    { id: 'move', label: '➡️ Move Forward', color: 'bg-primary' },
-    { id: 'turn', label: '↪️ Turn Right', color: 'bg-secondary' },
-    { id: 'repeat', label: '🔄 Repeat 2x', color: 'bg-accent' },
-    { id: 'end', label: '🏁 END', color: 'bg-warning' },
-  ];
-
-  const correctSequence = ['start', 'repeat', 'move', 'turn', 'end'];
-  const goal = "Help the robot walk in a square! It needs to move and turn twice.";
-
   const addBlock = (blockId: string) => {
-    if (placedBlocks.length < 5) {
+    if (placedBlocks.length < currentLevel.correct.length + 2) {
       setPlacedBlocks([...placedBlocks, blockId]);
     }
   };
@@ -656,81 +968,77 @@ const BlockBuilderGame = ({ onBack }: { onBack: () => void }) => {
   };
 
   const checkSolution = () => {
-    // Check if the sequence is correct
     const isCorrect = 
-      placedBlocks.length === correctSequence.length &&
-      placedBlocks.every((block, index) => block === correctSequence[index]);
+      placedBlocks.length === currentLevel.correct.length &&
+      placedBlocks.every((block, index) => block === currentLevel.correct[index]);
     
     if (isCorrect) {
       const stars = 3;
       setEarned(stars);
       setCompleted(true);
-      completeGame('block-builder', stars);
+      completeGameLevel(gameId, level, stars);
     }
   };
 
-  const clearBlocks = () => {
-    setPlacedBlocks([]);
-  };
-
   if (completed) {
-    return <CompletionScreen onBack={onBack} stars={earned} title="Master Builder! 🧱" message="You built the perfect program!" />;
+    const gameProgress = getGameLevel(gameId);
+    return (
+      <CompletionScreen 
+        onBack={onBack} 
+        stars={earned} 
+        title="Master Builder! 🧱" 
+        message="Perfect program!"
+        hasNextLevel={level < gameProgress.maxLevel}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-black text-foreground">🧱 Block Builder</h1>
-            <p className="text-muted-foreground">Build a program with blocks!</p>
-          </div>
-        </div>
+        <GameHeader
+          title="🧱 Block Builder"
+          subtitle="Build the program!"
+          level={level}
+          onBack={onBack}
+          onLevelSelect={onLevelSelect}
+        />
 
-        {/* Goal */}
         <Card variant="lesson" className="mb-6">
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Blocks className="w-8 h-8 text-primary" />
-              <p className="text-lg font-semibold">{goal}</p>
-            </div>
+            <p className="text-lg font-semibold">🎯 {currentLevel.goal}</p>
           </CardContent>
         </Card>
 
-        {/* Program Area */}
         <Card variant="game" className="mb-6">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center justify-between">
               Your Program
-              <Button variant="ghost" size="sm" onClick={clearBlocks}>
-                Clear All
+              <Button variant="ghost" size="sm" onClick={() => setPlacedBlocks([])}>
+                Clear
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="min-h-[200px] bg-muted/50 rounded-2xl p-4 border-2 border-dashed border-primary/30">
+            <div className="min-h-[150px] bg-muted/50 rounded-2xl p-4 border-2 border-dashed border-primary/30">
               {placedBlocks.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  Tap blocks below to add them here!
+                  Tap blocks below to add them!
                 </p>
               ) : (
                 <div className="space-y-2">
                   {placedBlocks.map((blockId, index) => {
-                    const block = availableBlocks.find(b => b.id === blockId);
+                    const block = currentLevel.blocks.find(b => b.id === blockId);
                     return (
                       <motion.div
                         key={`${blockId}-${index}`}
-                        initial={{ scale: 0, x: -20 }}
-                        animate={{ scale: 1, x: 0 }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
                         className={`${block?.color} text-card-foreground p-3 rounded-xl flex items-center justify-between cursor-pointer shadow-md`}
                         onClick={() => removeBlock(index)}
-                        whileHover={{ scale: 1.02 }}
                       >
                         <span className="font-bold">{block?.label}</span>
-                        <span className="text-sm opacity-70">tap to remove</span>
+                        <span className="text-xs opacity-70">×</span>
                       </motion.div>
                     );
                   })}
@@ -740,16 +1048,15 @@ const BlockBuilderGame = ({ onBack }: { onBack: () => void }) => {
           </CardContent>
         </Card>
 
-        {/* Available Blocks */}
         <div className="mb-6">
-          <p className="text-lg font-semibold mb-3">Available Blocks:</p>
+          <p className="text-lg font-semibold mb-3">Blocks:</p>
           <div className="grid grid-cols-2 gap-3">
-            {availableBlocks.map((block) => (
+            {currentLevel.blocks.map((block) => (
               <motion.div
                 key={block.id}
                 className={`${block.color} text-card-foreground p-4 rounded-xl cursor-pointer shadow-md text-center font-bold`}
                 onClick={() => addBlock(block.id)}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {block.label}
@@ -758,13 +1065,8 @@ const BlockBuilderGame = ({ onBack }: { onBack: () => void }) => {
           </div>
         </div>
 
-        <Button 
-          size="lg" 
-          className="w-full" 
-          onClick={checkSolution}
-          disabled={placedBlocks.length === 0}
-        >
-          Run Program ▶️
+        <Button size="lg" className="w-full" onClick={checkSolution} disabled={placedBlocks.length === 0}>
+          Run ▶️
         </Button>
       </div>
     </div>
