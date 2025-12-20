@@ -4,6 +4,7 @@ import { BookOpen, Gamepad2, HelpCircle, Trophy, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Mascot } from '@/components/Mascot';
 import { StarDisplay } from '@/components/StarDisplay';
+import { LevelBadge } from '@/components/LevelSystem';
 import { getProgress } from '@/lib/progress';
 import { useEffect, useState } from 'react';
 
@@ -16,11 +17,10 @@ const menuItems = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [stars, setStars] = useState(0);
+  const [progress, setProgress] = useState(getProgress());
 
   useEffect(() => {
-    const progress = getProgress();
-    setStars(progress.stars);
+    setProgress(getProgress());
   }, []);
 
   return (
@@ -49,27 +49,30 @@ const Index = () => {
         />
       </div>
 
-      {/* Star counter */}
-      <motion.div
-        className="absolute top-6 right-6"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <StarDisplay count={stars} size="lg" />
-      </motion.div>
+      {/* Top bar */}
+      <div className="absolute top-6 left-6 right-6 flex items-center justify-between">
+        {/* Settings button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+            <Settings className="w-6 h-6" />
+          </Button>
+        </motion.div>
 
-      {/* Settings button */}
-      <motion.div
-        className="absolute top-6 left-6"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
-          <Settings className="w-6 h-6" />
-        </Button>
-      </motion.div>
+        {/* Level and Stars */}
+        <motion.div
+          className="flex items-center gap-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <LevelBadge level={progress.playerLevel} size="md" />
+          <StarDisplay count={progress.stars} size="lg" />
+        </motion.div>
+      </div>
 
       {/* Main content */}
       <motion.div
