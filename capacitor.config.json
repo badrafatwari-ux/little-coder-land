@@ -1,0 +1,12 @@
+{
+  "appId": "app.lovable.67cce7de85fc408a9645bfaaf2e884b2",
+  "appName": "Programming for Kids",
+  "webDir": "dist",
+  "server": {
+    "url": "https://67cce7de-85fc-408a-9645-bfaaf2e884b2.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
