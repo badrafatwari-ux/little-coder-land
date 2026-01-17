@@ -27,20 +27,36 @@ export const MAX_PLAYER_LEVEL = 10;
 export const GAME_UNLOCK_LEVELS: Record<string, number> = {
   'sequence-robot': 1,
   'pattern-match': 1,
+  'memory-match': 1,
   'loop-patterns': 2,
   'if-else-path': 2,
+  'number-sort': 2,
   'bug-hunter': 3,
+  'variable-vault': 3,
+  'color-code': 3,
   'block-builder': 4,
+  'array-adventure': 4,
+  'function-factory': 4,
+  'maze-runner': 5,
+  'binary-basics': 5,
 };
 
 // Max levels per game
 export const GAME_MAX_LEVELS: Record<string, number> = {
   'sequence-robot': 3,
   'pattern-match': 3,
+  'memory-match': 3,
   'loop-patterns': 3,
   'if-else-path': 3,
+  'number-sort': 3,
   'bug-hunter': 3,
+  'variable-vault': 3,
+  'color-code': 3,
   'block-builder': 3,
+  'array-adventure': 3,
+  'function-factory': 3,
+  'maze-runner': 3,
+  'binary-basics': 3,
 };
 
 const defaultProgress: GameProgress = {

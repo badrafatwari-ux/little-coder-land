@@ -17,6 +17,12 @@ import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { LevelBadge, GameLevelIndicator, LockedOverlay } from '@/components/LevelSystem';
 import { playClick, playCorrect, playWrong, playStar, playGameComplete, playLevelUp, playTap, initAudio } from '@/lib/sounds';
+import { MemoryMatchGame } from '@/components/games/MemoryMatchGame';
+import { NumberSortGame } from '@/components/games/NumberSortGame';
+import { FunctionFactoryGame } from '@/components/games/FunctionFactoryGame';
+import { VariableVaultGame } from '@/components/games/VariableVaultGame';
+import { ColorCodeGame } from '@/components/games/ColorCodeGame';
+import { ArrayAdventureGame } from '@/components/games/ArrayAdventureGame';
 
 interface Game {
   id: string;
@@ -27,48 +33,18 @@ interface Game {
 }
 
 const games: Game[] = [
-  {
-    id: 'sequence-robot',
-    title: 'Robot Sequence',
-    description: 'Put the steps in order to help the robot!',
-    icon: '🤖',
-    difficulty: 'easy'
-  },
-  {
-    id: 'pattern-match',
-    title: 'Pattern Match',
-    description: 'Match the code to its output!',
-    icon: '🧩',
-    difficulty: 'easy'
-  },
-  {
-    id: 'loop-patterns',
-    title: 'Loop Patterns',
-    description: 'Use loops to complete the pattern!',
-    icon: '🔄',
-    difficulty: 'medium'
-  },
-  {
-    id: 'if-else-path',
-    title: 'Decision Path',
-    description: 'Choose the right path with if/else!',
-    icon: '🛤️',
-    difficulty: 'medium'
-  },
-  {
-    id: 'bug-hunter',
-    title: 'Bug Hunter',
-    description: 'Find and fix the bug in the code!',
-    icon: '🐛',
-    difficulty: 'medium'
-  },
-  {
-    id: 'block-builder',
-    title: 'Block Builder',
-    description: 'Build code with visual blocks!',
-    icon: '🧱',
-    difficulty: 'hard'
-  }
+  { id: 'sequence-robot', title: 'Robot Sequence', description: 'Put the steps in order!', icon: '🤖', difficulty: 'easy' },
+  { id: 'pattern-match', title: 'Pattern Match', description: 'Match code to output!', icon: '🧩', difficulty: 'easy' },
+  { id: 'memory-match', title: 'Memory Match', description: 'Match code symbols!', icon: '🧠', difficulty: 'easy' },
+  { id: 'loop-patterns', title: 'Loop Patterns', description: 'Complete the pattern!', icon: '🔄', difficulty: 'medium' },
+  { id: 'if-else-path', title: 'Decision Path', description: 'Choose the right path!', icon: '🛤️', difficulty: 'medium' },
+  { id: 'number-sort', title: 'Number Sort', description: 'Sort numbers in order!', icon: '📊', difficulty: 'medium' },
+  { id: 'bug-hunter', title: 'Bug Hunter', description: 'Find the bug in the code!', icon: '🐛', difficulty: 'medium' },
+  { id: 'variable-vault', title: 'Variable Vault', description: 'Track variable values!', icon: '📦', difficulty: 'medium' },
+  { id: 'color-code', title: 'Color Code', description: 'Remember the sequence!', icon: '🎨', difficulty: 'medium' },
+  { id: 'block-builder', title: 'Block Builder', description: 'Build with visual blocks!', icon: '🧱', difficulty: 'hard' },
+  { id: 'array-adventure', title: 'Array Adventure', description: 'Learn array indexing!', icon: '📋', difficulty: 'hard' },
+  { id: 'function-factory', title: 'Function Factory', description: 'Predict function output!', icon: '⚡', difficulty: 'hard' },
 ];
 
 const Play = () => {
@@ -220,6 +196,18 @@ const GameScreen = ({ game, level, onBack, onLevelChange }: GameScreenProps) => 
       return <PatternMatchGame {...gameProps} />;
     case 'block-builder':
       return <BlockBuilderGame {...gameProps} />;
+    case 'memory-match':
+      return <MemoryMatchGame {...gameProps} />;
+    case 'number-sort':
+      return <NumberSortGame {...gameProps} />;
+    case 'function-factory':
+      return <FunctionFactoryGame {...gameProps} />;
+    case 'variable-vault':
+      return <VariableVaultGame {...gameProps} />;
+    case 'color-code':
+      return <ColorCodeGame {...gameProps} />;
+    case 'array-adventure':
+      return <ArrayAdventureGame {...gameProps} />;
     default:
       return null;
   }
