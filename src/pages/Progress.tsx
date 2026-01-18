@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Trophy, BookOpen, Gamepad2, Award, Zap } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getProgress, getXPProgress, XP_PER_LEVEL, MAX_PLAYER_LEVEL, GAME_UNLOCK_LEVELS } from '@/lib/progress';
+import { t, getLanguage } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { Mascot } from '@/components/Mascot';
 import { StarDisplay } from '@/components/StarDisplay';
@@ -11,9 +12,9 @@ import { LevelBadge } from '@/components/LevelSystem';
 
 interface Badge {
   id: string;
-  name: string;
+  nameKey: keyof typeof import('@/lib/i18n').translations.en;
   icon: string;
-  description: string;
+  descKey: keyof typeof import('@/lib/i18n').translations.en;
   unlocked: boolean;
 }
 
@@ -34,70 +35,70 @@ const Progress = () => {
   const badges: Badge[] = [
     {
       id: 'first-lesson',
-      name: 'First Steps',
+      nameKey: 'badgeFirstSteps',
       icon: '🎓',
-      description: 'Complete your first lesson',
+      descKey: 'badgeFirstStepsDesc',
       unlocked: progress.completedLessons.length >= 1
     },
     {
       id: 'all-lessons',
-      name: 'Scholar',
+      nameKey: 'badgeScholar',
       icon: '📚',
-      description: 'Complete all lessons',
+      descKey: 'badgeScholarDesc',
       unlocked: progress.completedLessons.length >= 5
     },
     {
       id: 'first-game',
-      name: 'Player One',
+      nameKey: 'badgePlayerOne',
       icon: '🎮',
-      description: 'Complete your first game level',
+      descKey: 'badgePlayerOneDesc',
       unlocked: totalGameLevels >= 1
     },
     {
       id: 'quiz-master',
-      name: 'Quiz Master',
+      nameKey: 'badgeQuizMaster',
       icon: '🏆',
-      description: 'Score 80% or higher on quiz',
+      descKey: 'badgeQuizMasterDesc',
       unlocked: Object.values(progress.quizScores).some(score => score >= 80)
     },
     {
       id: 'star-collector',
-      name: 'Star Collector',
+      nameKey: 'badgeStarCollector',
       icon: '⭐',
-      description: 'Earn 20 stars',
+      descKey: 'badgeStarCollectorDesc',
       unlocked: progress.totalStars >= 20
     },
     {
       id: 'level-5',
-      name: 'Rising Star',
+      nameKey: 'badgeRisingStar',
       icon: '🌟',
-      description: 'Reach Level 5',
+      descKey: 'badgeRisingStarDesc',
       unlocked: progress.playerLevel >= 5
     },
     {
       id: 'all-unlocked',
-      name: 'Explorer',
+      nameKey: 'badgeExplorer',
       icon: '🗺️',
-      description: 'Unlock all games',
+      descKey: 'badgeExplorerDesc',
       unlocked: progress.playerLevel >= 4
     },
     {
       id: 'super-coder',
-      name: 'Super Coder',
+      nameKey: 'badgeSuperCoder',
       icon: '💻',
-      description: 'Reach max level',
+      descKey: 'badgeSuperCoderDesc',
       unlocked: progress.playerLevel >= MAX_PLAYER_LEVEL
     }
   ];
 
-  const motivationMessages = [
-    "You're doing amazing! Keep it up! 🚀",
-    "Every expert was once a beginner! 💪",
-    "Learning to code is like a superpower! ⚡",
-    "You're on your way to becoming a coder! 🌟"
+  const motivationKeys: (keyof typeof import('@/lib/i18n').translations.en)[] = [
+    'motivation1',
+    'motivation2',
+    'motivation3',
+    'motivation4'
   ];
 
-  const randomMessage = motivationMessages[Math.floor(Math.random() * motivationMessages.length)];
+  const randomMessage = t(motivationKeys[Math.floor(Math.random() * motivationKeys.length)]);
 
   // Games that will unlock at next levels
   const upcomingUnlocks = Object.entries(GAME_UNLOCK_LEVELS)
@@ -118,8 +119,8 @@ const Progress = () => {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div>
-            <h1 className="text-3xl font-black text-foreground">Your Progress</h1>
-            <p className="text-muted-foreground">See how far you've come! 📈</p>
+            <h1 className="text-3xl font-black text-foreground">{t('yourProgress')}</h1>
+            <p className="text-muted-foreground">{t('seeHowFar')}</p>
           </div>
         </div>
 
@@ -132,7 +133,7 @@ const Progress = () => {
                 <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
                   <LevelBadge level={progress.playerLevel} size="lg" />
                   <div>
-                    <p className="text-2xl font-black text-foreground">Level {progress.playerLevel}</p>
+                    <p className="text-2xl font-black text-foreground">{t('level')} {progress.playerLevel}</p>
                     <p className="text-muted-foreground">{randomMessage}</p>
                   </div>
                 </div>
@@ -143,7 +144,7 @@ const Progress = () => {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-semibold flex items-center gap-1">
                         <Zap className="w-4 h-4 text-warning" />
-                        XP Progress
+                        {t('xpProgress')}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         {xpProgress.current} / {xpProgress.needed} XP
@@ -158,12 +159,12 @@ const Progress = () => {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {XP_PER_LEVEL - xpProgress.current} XP until Level {progress.playerLevel + 1}
+                      {XP_PER_LEVEL - xpProgress.current} {t('xpUntilLevel')} {progress.playerLevel + 1}
                     </p>
                   </div>
                 ) : (
                   <div className="bg-success/20 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-success">🎉 MAX LEVEL REACHED!</p>
+                    <p className="text-lg font-bold text-success">{t('maxLevelReached')}</p>
                   </div>
                 )}
 
@@ -177,7 +178,7 @@ const Progress = () => {
         {upcomingUnlocks.length > 0 && (
           <Card variant="lesson" className="mb-8">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">🔓 Coming Soon</CardTitle>
+              <CardTitle className="text-lg">{t('comingSoon')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-3">
@@ -191,7 +192,7 @@ const Progress = () => {
                     </span>
                     <div>
                       <p className="font-semibold text-sm">{gameId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</p>
-                      <p className="text-xs text-muted-foreground">Unlocks at Level {level}</p>
+                      <p className="text-xs text-muted-foreground">{t('unlocksAtLevel')} {level}</p>
                     </div>
                   </div>
                 ))}
@@ -210,7 +211,7 @@ const Progress = () => {
             <Card className="text-center p-6">
               <BookOpen className="w-10 h-10 mx-auto text-primary mb-2" />
               <p className="text-3xl font-black text-foreground">{progress.completedLessons.length}</p>
-              <p className="text-sm text-muted-foreground">Lessons</p>
+              <p className="text-sm text-muted-foreground">{t('lessons')}</p>
             </Card>
           </motion.div>
           <motion.div
@@ -221,7 +222,7 @@ const Progress = () => {
             <Card className="text-center p-6">
               <Gamepad2 className="w-10 h-10 mx-auto text-secondary mb-2" />
               <p className="text-3xl font-black text-foreground">{totalGameLevels}</p>
-              <p className="text-sm text-muted-foreground">Levels</p>
+              <p className="text-sm text-muted-foreground">{t('levels')}</p>
             </Card>
           </motion.div>
           <motion.div
@@ -232,7 +233,7 @@ const Progress = () => {
             <Card className="text-center p-6">
               <Trophy className="w-10 h-10 mx-auto text-warning mb-2" />
               <p className="text-3xl font-black text-foreground">{badges.filter(b => b.unlocked).length}</p>
-              <p className="text-sm text-muted-foreground">Badges</p>
+              <p className="text-sm text-muted-foreground">{t('badges')}</p>
             </Card>
           </motion.div>
         </div>
@@ -242,7 +243,7 @@ const Progress = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="w-6 h-6 text-accent" />
-              Badges
+              {t('badges')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -262,8 +263,8 @@ const Progress = () => {
                   <span className={`text-4xl ${badge.unlocked ? '' : 'grayscale'}`}>
                     {badge.icon}
                   </span>
-                  <p className="font-bold mt-2 text-sm">{badge.name}</p>
-                  <p className="text-xs text-muted-foreground">{badge.description}</p>
+                  <p className="font-bold mt-2 text-sm">{t(badge.nameKey)}</p>
+                  <p className="text-xs text-muted-foreground">{t(badge.descKey)}</p>
                   {badge.unlocked && (
                     <motion.div
                       initial={{ scale: 0 }}

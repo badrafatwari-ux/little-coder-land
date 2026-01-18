@@ -8,67 +8,68 @@ import { saveQuizScore } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playClick, playCorrect, playWrong, playStar, playGameComplete, initAudio } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface Question {
   id: string;
-  question: string;
-  options: { text: string; icon: string }[];
+  questionKey: keyof typeof import('@/lib/i18n').translations.en;
+  options: { textKey: keyof typeof import('@/lib/i18n').translations.en; icon: string }[];
   correctIndex: number;
 }
 
 const questions: Question[] = [
   {
     id: 'q1',
-    question: 'What is a program?',
+    questionKey: 'q1Question',
     options: [
-      { text: 'A TV show', icon: '📺' },
-      { text: 'Instructions for a computer', icon: '💻' },
-      { text: 'A type of food', icon: '🍕' },
-      { text: 'A game controller', icon: '🎮' }
+      { textKey: 'q1Option1', icon: '📺' },
+      { textKey: 'q1Option2', icon: '💻' },
+      { textKey: 'q1Option3', icon: '🍕' },
+      { textKey: 'q1Option4', icon: '🎮' }
     ],
     correctIndex: 1
   },
   {
     id: 'q2',
-    question: 'What does a LOOP do?',
+    questionKey: 'q2Question',
     options: [
-      { text: 'Makes things disappear', icon: '🫥' },
-      { text: 'Repeats actions', icon: '🔄' },
-      { text: 'Stops the program', icon: '⛔' },
-      { text: 'Plays music', icon: '🎵' }
+      { textKey: 'q2Option1', icon: '🫥' },
+      { textKey: 'q2Option2', icon: '🔄' },
+      { textKey: 'q2Option3', icon: '⛔' },
+      { textKey: 'q2Option4', icon: '🎵' }
     ],
     correctIndex: 1
   },
   {
     id: 'q3',
-    question: 'IF it is raining, what should you do?',
+    questionKey: 'q3Question',
     options: [
-      { text: 'Take umbrella', icon: '☂️' },
-      { text: 'Wear sunglasses', icon: '🕶️' },
-      { text: 'Go swimming', icon: '🏊' },
-      { text: 'Fly a kite', icon: '🪁' }
+      { textKey: 'q3Option1', icon: '☂️' },
+      { textKey: 'q3Option2', icon: '🕶️' },
+      { textKey: 'q3Option3', icon: '🏊' },
+      { textKey: 'q3Option4', icon: '🪁' }
     ],
     correctIndex: 0
   },
   {
     id: 'q4',
-    question: 'What is a VARIABLE?',
+    questionKey: 'q4Question',
     options: [
-      { text: 'A type of robot', icon: '🤖' },
-      { text: 'A box that stores information', icon: '📦' },
-      { text: 'A loud sound', icon: '📢' },
-      { text: 'A dance move', icon: '💃' }
+      { textKey: 'q4Option1', icon: '🤖' },
+      { textKey: 'q4Option2', icon: '📦' },
+      { textKey: 'q4Option3', icon: '📢' },
+      { textKey: 'q4Option4', icon: '💃' }
     ],
     correctIndex: 1
   },
   {
     id: 'q5',
-    question: 'What is SEQUENCE in coding?',
+    questionKey: 'q5Question',
     options: [
-      { text: 'Random order', icon: '🎲' },
-      { text: 'Steps in order', icon: '📝' },
-      { text: 'Backwards steps', icon: '⏪' },
-      { text: 'Skip steps', icon: '⏭️' }
+      { textKey: 'q5Option1', icon: '🎲' },
+      { textKey: 'q5Option2', icon: '📝' },
+      { textKey: 'q5Option3', icon: '⏪' },
+      { textKey: 'q5Option4', icon: '⏭️' }
     ],
     correctIndex: 1
   }
@@ -136,10 +137,10 @@ const Quiz = () => {
         >
           <Mascot mood={finalScore >= 60 ? 'celebrating' : 'thinking'} size="lg" />
           <h2 className="text-3xl font-black text-foreground mt-6 mb-4">
-            {finalScore >= 80 ? 'Amazing! 🎉' : finalScore >= 60 ? 'Great Job! 👏' : 'Keep Learning! 📚'}
+            {finalScore >= 80 ? t('amazing') : finalScore >= 60 ? 'Great Job! 👏' : 'Keep Learning! 📚'}
           </h2>
           <StarDisplay count={stars} maxStars={3} size="lg" animated />
-          <p className="text-2xl font-bold text-primary mt-6">{score} / {questions.length} Correct</p>
+          <p className="text-2xl font-bold text-primary mt-6">{score} / {questions.length} {t('correct').split('!')[0]}</p>
           <p className="text-lg text-muted-foreground mt-2 mb-8">{finalScore}% Score</p>
           
           <div className="flex gap-4">
@@ -151,10 +152,10 @@ const Quiz = () => {
               setAnswers([]);
               setIsComplete(false);
             }}>
-              Try Again
+              {t('tryAgain')}
             </Button>
             <Button size="lg" onClick={() => navigate('/')}>
-              Home
+              {t('home')}
             </Button>
           </div>
         </motion.div>
@@ -171,10 +172,10 @@ const Quiz = () => {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-black text-foreground">Quiz Time!</h1>
-            <p className="text-muted-foreground">Question {currentQuestion + 1} of {questions.length}</p>
+            <h1 className="text-2xl font-black text-foreground">{t('quizTime')}</h1>
+            <p className="text-muted-foreground">{t('question')} {currentQuestion + 1} {t('of')} {questions.length}</p>
           </div>
-          <div className="text-xl font-bold text-primary">{score} pts</div>
+          <div className="text-xl font-bold text-primary">{score} {t('pts')}</div>
         </div>
 
         {/* Progress bar */}
@@ -195,7 +196,7 @@ const Quiz = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              {question.question}
+              {t(question.questionKey)}
             </motion.h2>
           </CardContent>
         </Card>
@@ -226,7 +227,7 @@ const Quiz = () => {
                   disabled={showResult}
                 >
                   <span className="text-3xl">{option.icon}</span>
-                  <span>{option.text}</span>
+                  <span>{t(option.textKey)}</span>
                 </Button>
               </motion.div>
             );
@@ -245,12 +246,12 @@ const Quiz = () => {
             {isCorrect ? (
               <>
                 <CheckCircle2 className="w-8 h-8" />
-                <span className="text-xl font-bold">Correct! Great job! 🎉</span>
+                <span className="text-xl font-bold">{t('correct')}</span>
               </>
             ) : (
               <>
                 <XCircle className="w-8 h-8" />
-                <span className="text-xl font-bold">Not quite! Keep trying! 💪</span>
+                <span className="text-xl font-bold">{t('notQuite')}</span>
               </>
             )}
           </motion.div>
@@ -259,11 +260,11 @@ const Quiz = () => {
         {/* Actions */}
         {!showResult ? (
           <Button size="lg" className="w-full" onClick={handleCheck} disabled={selectedAnswer === null}>
-            Check Answer
+            {t('checkAnswer')}
           </Button>
         ) : (
           <Button size="lg" className="w-full" onClick={handleNext}>
-            {currentQuestion < questions.length - 1 ? 'Next Question →' : 'See Results'}
+            {currentQuestion < questions.length - 1 ? t('nextQuestion') : t('seeResults')}
           </Button>
         )}
       </div>
