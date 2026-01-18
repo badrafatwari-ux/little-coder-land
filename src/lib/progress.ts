@@ -39,6 +39,10 @@ export const GAME_UNLOCK_LEVELS: Record<string, number> = {
   'function-factory': 4,
   'maze-runner': 5,
   'binary-basics': 5,
+  'pixel-art': 5,
+  'operator-quest': 6,
+  'typing-code': 6,
+  'data-types': 7,
 };
 
 // Max levels per game
@@ -57,6 +61,10 @@ export const GAME_MAX_LEVELS: Record<string, number> = {
   'function-factory': 3,
   'maze-runner': 3,
   'binary-basics': 3,
+  'pixel-art': 3,
+  'operator-quest': 3,
+  'typing-code': 3,
+  'data-types': 3,
 };
 
 const defaultProgress: GameProgress = {

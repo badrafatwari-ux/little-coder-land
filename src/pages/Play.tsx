@@ -23,6 +23,12 @@ import { FunctionFactoryGame } from '@/components/games/FunctionFactoryGame';
 import { VariableVaultGame } from '@/components/games/VariableVaultGame';
 import { ColorCodeGame } from '@/components/games/ColorCodeGame';
 import { ArrayAdventureGame } from '@/components/games/ArrayAdventureGame';
+import { MazeRunnerGame } from '@/components/games/MazeRunnerGame';
+import { BinaryBasicsGame } from '@/components/games/BinaryBasicsGame';
+import { PixelArtGame } from '@/components/games/PixelArtGame';
+import { OperatorQuestGame } from '@/components/games/OperatorQuestGame';
+import { TypingCodeGame } from '@/components/games/TypingCodeGame';
+import { DataTypeGame } from '@/components/games/DataTypeGame';
 
 interface Game {
   id: string;
@@ -45,6 +51,12 @@ const games: Game[] = [
   { id: 'block-builder', title: 'Block Builder', description: 'Build with visual blocks!', icon: '🧱', difficulty: 'hard' },
   { id: 'array-adventure', title: 'Array Adventure', description: 'Learn array indexing!', icon: '📋', difficulty: 'hard' },
   { id: 'function-factory', title: 'Function Factory', description: 'Predict function output!', icon: '⚡', difficulty: 'hard' },
+  { id: 'maze-runner', title: 'Maze Runner', description: 'Program the robot path!', icon: '🗺️', difficulty: 'hard' },
+  { id: 'binary-basics', title: 'Binary Basics', description: 'Learn binary numbers!', icon: '🔢', difficulty: 'hard' },
+  { id: 'pixel-art', title: 'Pixel Art', description: 'Create pixel patterns!', icon: '🎨', difficulty: 'hard' },
+  { id: 'operator-quest', title: 'Operator Quest', description: 'Find the right operator!', icon: '🧮', difficulty: 'hard' },
+  { id: 'typing-code', title: 'Typing Code', description: 'Type code quickly!', icon: '⌨️', difficulty: 'hard' },
+  { id: 'data-types', title: 'Data Types', description: 'Identify data types!', icon: '📊', difficulty: 'hard' },
 ];
 
 const Play = () => {
@@ -208,6 +220,18 @@ const GameScreen = ({ game, level, onBack, onLevelChange }: GameScreenProps) => 
       return <ColorCodeGame {...gameProps} />;
     case 'array-adventure':
       return <ArrayAdventureGame {...gameProps} />;
+    case 'maze-runner':
+      return <MazeRunnerGame {...gameProps} />;
+    case 'binary-basics':
+      return <BinaryBasicsGame {...gameProps} />;
+    case 'pixel-art':
+      return <PixelArtGame {...gameProps} />;
+    case 'operator-quest':
+      return <OperatorQuestGame {...gameProps} />;
+    case 'typing-code':
+      return <TypingCodeGame {...gameProps} />;
+    case 'data-types':
+      return <DataTypeGame {...gameProps} />;
     default:
       return null;
   }
