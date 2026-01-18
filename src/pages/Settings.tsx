@@ -4,6 +4,7 @@ import { ArrowLeft, Trash2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { resetProgress } from '@/lib/progress';
+import { t } from '@/lib/i18n';
 import { useState } from 'react';
 import { Mascot } from '@/components/Mascot';
 
@@ -28,7 +29,7 @@ const Settings = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
             <ArrowLeft className="w-6 h-6" />
           </Button>
-          <h1 className="text-3xl font-black text-foreground">Settings</h1>
+          <h1 className="text-3xl font-black text-foreground">{t('settings')}</h1>
         </div>
 
         {/* About */}
@@ -36,17 +37,16 @@ const Settings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="w-5 h-5" />
-              About This App
+              {t('aboutThisApp')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6">
               <Mascot mood="happy" size="sm" />
               <div>
-                <p className="text-lg font-semibold mb-2">Programming for Kids</p>
+                <p className="text-lg font-semibold mb-2">{t('programmingForKids')}</p>
                 <p className="text-muted-foreground">
-                  Learn the basics of programming through fun games and lessons! 
-                  This app works completely offline - no internet needed.
+                  {t('appDescription')}
                 </p>
               </div>
             </div>
@@ -58,28 +58,28 @@ const Settings = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <Trash2 className="w-5 h-5" />
-              Reset Progress
+              {t('resetProgress')}
             </CardTitle>
             <CardDescription>
-              This will delete all your stars, badges, and completed lessons.
+              {t('resetWarning')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!showResetConfirm ? (
               <Button variant="destructive" onClick={() => setShowResetConfirm(true)}>
-                Reset All Progress
+                {t('resetAllProgress')}
               </Button>
             ) : (
               <div className="space-y-4">
                 <p className="text-lg font-semibold text-destructive">
-                  Are you sure? This cannot be undone!
+                  {t('areYouSure')}
                 </p>
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={() => setShowResetConfirm(false)}>
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button variant="destructive" onClick={handleReset}>
-                    Yes, Reset Everything
+                    {t('yesResetEverything')}
                   </Button>
                 </div>
               </div>
@@ -91,10 +91,10 @@ const Settings = () => {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-muted-foreground">
-              Made with ❤️ for young coders everywhere!
+              {t('madeWithLove')}
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Version 1.0.0
+              {t('version')} 1.0.0
             </p>
           </CardContent>
         </Card>

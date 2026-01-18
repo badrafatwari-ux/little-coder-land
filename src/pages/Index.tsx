@@ -5,20 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Mascot } from '@/components/Mascot';
 import { StarDisplay } from '@/components/StarDisplay';
 import { LevelBadge } from '@/components/LevelSystem';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { getProgress } from '@/lib/progress';
 import { initAudio, playClick } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
-
-const menuItems = [
-  { label: 'Learn', icon: BookOpen, path: '/learn', variant: 'default' as const, color: 'from-primary to-primary/80' },
-  { label: 'Play', icon: Gamepad2, path: '/play', variant: 'secondary' as const, color: 'from-secondary to-secondary/80' },
-  { label: 'Quiz', icon: HelpCircle, path: '/quiz', variant: 'accent' as const, color: 'from-accent to-accent/80' },
-  { label: 'Progress', icon: Trophy, path: '/progress', variant: 'success' as const, color: 'from-success to-success/80' },
-];
 
 const Index = () => {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(getProgress());
+
+  const menuItems = [
+    { label: t('learn'), icon: BookOpen, path: '/learn', variant: 'default' as const, color: 'from-primary to-primary/80' },
+    { label: t('play'), icon: Gamepad2, path: '/play', variant: 'secondary' as const, color: 'from-secondary to-secondary/80' },
+    { label: t('quiz'), icon: HelpCircle, path: '/quiz', variant: 'accent' as const, color: 'from-accent to-accent/80' },
+    { label: t('progress'), icon: Trophy, path: '/progress', variant: 'success' as const, color: 'from-success to-success/80' },
+  ];
 
   useEffect(() => {
     setProgress(getProgress());
@@ -52,8 +54,9 @@ const Index = () => {
 
       {/* Top bar */}
       <div className="absolute top-6 left-6 right-6 flex items-center justify-between">
-        {/* Settings button */}
+        {/* Settings and Language */}
         <motion.div
+          className="flex items-center gap-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
@@ -61,6 +64,7 @@ const Index = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
             <Settings className="w-6 h-6" />
           </Button>
+          <LanguageSwitcher />
         </motion.div>
 
         {/* Level and Stars */}
@@ -93,13 +97,13 @@ const Index = () => {
           transition={{ delay: 0.2 }}
         >
           <h1 className="text-4xl md:text-5xl font-black text-foreground mb-2">
-            Programming
+            {t('programming')}
           </h1>
           <h2 className="text-3xl md:text-4xl font-bold text-gradient-primary">
-            for Kids
+            {t('forKids')}
           </h2>
           <p className="mt-4 text-lg text-muted-foreground font-medium">
-            Learn to code through fun games! 🎮
+            {t('tagline')}
           </p>
         </motion.div>
 

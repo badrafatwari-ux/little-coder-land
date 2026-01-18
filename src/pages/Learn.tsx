@@ -4,80 +4,81 @@ import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { getProgress, completeLesson } from '@/lib/progress';
+import { t } from '@/lib/i18n';
 import { useState, useEffect } from 'react';
 
 interface Lesson {
   id: string;
-  title: string;
-  description: string;
+  titleKey: keyof typeof import('@/lib/i18n').translations.en;
+  descKey: keyof typeof import('@/lib/i18n').translations.en;
   icon: string;
   color: string;
   content: {
-    explanation: string;
-    example: string;
-    interactive: string;
+    explanationKey: keyof typeof import('@/lib/i18n').translations.en;
+    exampleKey: keyof typeof import('@/lib/i18n').translations.en;
+    interactiveKey: keyof typeof import('@/lib/i18n').translations.en;
   };
 }
 
 const lessons: Lesson[] = [
   {
     id: 'program',
-    title: 'What is a Program?',
-    description: 'Learn what programs are and how they work',
+    titleKey: 'lessonProgram',
+    descKey: 'lessonProgramDesc',
     icon: '💻',
     color: 'from-primary to-primary/70',
     content: {
-      explanation: 'A program is like a recipe for a computer! Just like a recipe tells you step by step how to make a cake, a program tells the computer what to do.',
-      example: 'When you play a game, a program tells the computer to show pictures, play sounds, and respond when you press buttons!',
-      interactive: 'Think of your morning routine as a program: Wake up → Brush teeth → Eat breakfast → Get dressed → Go to school!'
+      explanationKey: 'lessonProgramExplanation',
+      exampleKey: 'lessonProgramExample',
+      interactiveKey: 'lessonProgramInteractive'
     }
   },
   {
     id: 'sequence',
-    title: 'Sequence',
-    description: 'Steps that happen one after another',
+    titleKey: 'lessonSequence',
+    descKey: 'lessonSequenceDesc',
     icon: '📝',
     color: 'from-secondary to-secondary/70',
     content: {
-      explanation: 'A sequence is when things happen in order, one step at a time. The computer follows instructions from top to bottom!',
-      example: 'Making a sandwich: 1. Get bread 2. Add peanut butter 3. Add jelly 4. Put bread on top',
-      interactive: 'The order matters! You can\'t eat the sandwich before you make it!'
+      explanationKey: 'lessonSequenceExplanation',
+      exampleKey: 'lessonSequenceExample',
+      interactiveKey: 'lessonSequenceInteractive'
     }
   },
   {
     id: 'loops',
-    title: 'Loops',
-    description: 'Repeating actions over and over',
+    titleKey: 'lessonLoops',
+    descKey: 'lessonLoopsDesc',
     icon: '🔄',
     color: 'from-success to-success/70',
     content: {
-      explanation: 'A loop repeats the same actions multiple times. Instead of writing the same thing 10 times, we use a loop!',
-      example: 'Brushing teeth: Repeat 30 times → Move brush up and down',
-      interactive: 'Imagine drawing 100 stars. With a loop, you just say "draw a star, repeat 100 times"!'
+      explanationKey: 'lessonLoopsExplanation',
+      exampleKey: 'lessonLoopsExample',
+      interactiveKey: 'lessonLoopsInteractive'
     }
   },
   {
     id: 'conditions',
-    title: 'If / Else',
-    description: 'Making decisions in code',
+    titleKey: 'lessonConditions',
+    descKey: 'lessonConditionsDesc',
     icon: '🤔',
     color: 'from-accent to-accent/70',
     content: {
-      explanation: 'Conditions let the computer make choices. IF something is true, do one thing. ELSE, do something different!',
-      example: 'IF it is raining → Take umbrella, ELSE → Wear sunglasses',
-      interactive: 'Games use conditions: IF player touches coin → Add points, ELSE IF player touches enemy → Lose life'
+      explanationKey: 'lessonConditionsExplanation',
+      exampleKey: 'lessonConditionsExample',
+      interactiveKey: 'lessonConditionsInteractive'
     }
   },
   {
     id: 'variables',
-    title: 'Variables',
-    description: 'Boxes that store information',
+    titleKey: 'lessonVariables',
+    descKey: 'lessonVariablesDesc',
     icon: '📦',
     color: 'from-warning to-warning/70',
     content: {
-      explanation: 'A variable is like a labeled box that holds something. You can put things in, take things out, and change what\'s inside!',
-      example: 'score = 0 (a box called "score" with 0 inside). When you get a point: score = score + 1',
-      interactive: 'Your name is stored in a variable! playerName = "Alex"'
+      explanationKey: 'lessonVariablesExplanation',
+      exampleKey: 'lessonVariablesExample',
+      interactiveKey: 'lessonVariablesInteractive'
     }
   }
 ];
@@ -115,8 +116,8 @@ const Learn = () => {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div>
-            <h1 className="text-3xl font-black text-foreground">Learn Programming</h1>
-            <p className="text-muted-foreground">Tap a lesson to start learning! 📚</p>
+            <h1 className="text-3xl font-black text-foreground">{t('learnProgramming')}</h1>
+            <p className="text-muted-foreground">{t('tapLessonToStart')}</p>
           </div>
         </div>
 
@@ -148,8 +149,8 @@ const Learn = () => {
                       </motion.div>
                     )}
                   </div>
-                  <CardTitle className="text-xl">{lesson.title}</CardTitle>
-                  <CardDescription>{lesson.description}</CardDescription>
+                  <CardTitle className="text-xl">{t(lesson.titleKey)}</CardTitle>
+                  <CardDescription>{t(lesson.descKey)}</CardDescription>
                 </CardHeader>
               </Card>
             </motion.div>
@@ -169,7 +170,18 @@ interface LessonDetailProps {
 const LessonDetail = ({ lesson, onComplete, onBack }: LessonDetailProps) => {
   const [step, setStep] = useState(0);
   const steps = ['explanation', 'example', 'interactive'] as const;
-  const stepTitles = ['What is it?', 'Example', 'Try it!'];
+  const stepTitles = [t('whatIsIt'), t('example'), t('tryIt')];
+
+  const getContent = () => {
+    switch (steps[step]) {
+      case 'explanation':
+        return t(lesson.content.explanationKey);
+      case 'example':
+        return t(lesson.content.exampleKey);
+      case 'interactive':
+        return t(lesson.content.interactiveKey);
+    }
+  };
 
   return (
     <div className="min-h-screen p-6">
@@ -185,7 +197,7 @@ const LessonDetail = ({ lesson, onComplete, onBack }: LessonDetailProps) => {
           </Button>
           <div className="flex items-center gap-3">
             <span className="text-4xl">{lesson.icon}</span>
-            <h1 className="text-2xl font-black text-foreground">{lesson.title}</h1>
+            <h1 className="text-2xl font-black text-foreground">{t(lesson.titleKey)}</h1>
           </div>
         </div>
 
@@ -214,7 +226,7 @@ const LessonDetail = ({ lesson, onComplete, onBack }: LessonDetailProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              {lesson.content[steps[step]]}
+              {getContent()}
             </motion.p>
           </CardContent>
         </Card>
@@ -223,17 +235,17 @@ const LessonDetail = ({ lesson, onComplete, onBack }: LessonDetailProps) => {
         <div className="flex justify-between gap-4">
           {step > 0 && (
             <Button variant="outline" size="lg" onClick={() => setStep(step - 1)}>
-              Back
+              {t('back')}
             </Button>
           )}
           <div className="flex-1" />
           {step < steps.length - 1 ? (
             <Button size="lg" onClick={() => setStep(step + 1)}>
-              Next →
+              {t('next')}
             </Button>
           ) : (
             <Button variant="success" size="lg" onClick={() => onComplete(lesson.id)}>
-              Complete! ⭐
+              {t('complete')}
             </Button>
           )}
         </div>
