@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface ColorCodeGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -165,8 +166,8 @@ export const ColorCodeGame = ({ onBack, level, onLevelSelect, gameId }: ColorCod
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Color Coder! 🎨" 
-        message="Perfect memory!"
+        title={t('colorCoder')}
+        message={t('perfectMemory')}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -176,8 +177,8 @@ export const ColorCodeGame = ({ onBack, level, onLevelSelect, gameId }: ColorCod
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="🎨 Color Code"
-          subtitle="Remember the color sequence!"
+          title={`🎨 ${t('colorCode')}`}
+          subtitle={t('rememberSequence')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -187,7 +188,7 @@ export const ColorCodeGame = ({ onBack, level, onLevelSelect, gameId }: ColorCod
           <CardContent className="p-6 text-center">
             {phase === 'showing' ? (
               <>
-                <p className="text-lg font-semibold mb-4">Watch the sequence!</p>
+                <p className="text-lg font-semibold mb-4">{t('watchSequence')}</p>
                 <motion.div
                   key={currentShowIndex}
                   initial={{ scale: 0 }}
@@ -202,7 +203,7 @@ export const ColorCodeGame = ({ onBack, level, onLevelSelect, gameId }: ColorCod
               </>
             ) : (
               <>
-                <p className="text-lg font-semibold mb-4">Now repeat the sequence!</p>
+                <p className="text-lg font-semibold mb-4">{t('repeatSequence')}</p>
                 <div className="flex justify-center gap-2 mb-4 min-h-[60px]">
                   {userSequence.map((colorIdx, i) => (
                     <motion.span
@@ -248,7 +249,7 @@ export const ColorCodeGame = ({ onBack, level, onLevelSelect, gameId }: ColorCod
           className="w-full" 
           onClick={restartSequence}
         >
-          Show Again 👀
+          {t('showAgain')}
         </Button>
       </div>
     </div>

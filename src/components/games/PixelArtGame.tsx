@@ -7,6 +7,7 @@ import { completeGameLevel, getGameLevel } from '@/lib/progress';
 import { playCorrect, playWrong, playGameComplete, playStar, playClick } from '@/lib/sounds';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface GameProps {
   onBack: () => void;
@@ -16,7 +17,6 @@ interface GameProps {
 }
 
 const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#A8E6CF'];
-const colorNames = ['Merah', 'Biru', 'Kuning', 'Hijau Muda', 'Hijau'];
 
 const levelPatterns = [
   // Level 1 - Simple 3x3 pattern
@@ -27,7 +27,8 @@ const levelPatterns = [
       [1, 1, 1],
       [0, 1, 0],
     ],
-    hint: 'Buat tanda plus (+)!',
+    hintEn: 'Create a plus sign (+)!',
+    hintId: 'Buat tanda plus (+)!',
   },
   // Level 2 - 4x4 pattern
   {
@@ -38,7 +39,8 @@ const levelPatterns = [
       [0, 2, 2, 0],
       [0, 0, 0, 0],
     ],
-    hint: 'Buat kotak kuning di tengah!',
+    hintEn: 'Create a yellow square in the center!',
+    hintId: 'Buat kotak kuning di tengah!',
   },
   // Level 3 - 5x5 pattern
   {
@@ -50,11 +52,13 @@ const levelPatterns = [
       [0, 1, 0, 1, 0],
       [1, 0, 0, 0, 1],
     ],
-    hint: 'Buat huruf X besar!',
+    hintEn: 'Create a big X!',
+    hintId: 'Buat huruf X besar!',
   },
 ];
 
 export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const lang = getLanguage();
   const pattern = levelPatterns[Math.min(level - 1, levelPatterns.length - 1)];
   const [grid, setGrid] = useState<number[][]>(
     Array(pattern.size).fill(null).map(() => Array(pattern.size).fill(-1))
@@ -121,13 +125,13 @@ export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
       <div className="min-h-screen p-6 flex flex-col items-center justify-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-center">
           <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Karya Seni! 🎨</h2>
+          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">{t('pixelArtist')}</h2>
           <StarDisplay count={earnedStars} maxStars={3} size="lg" animated />
-          <p className="text-xl text-muted-foreground mt-4 mb-8">Level {level} selesai!</p>
+          <p className="text-xl text-muted-foreground mt-4 mb-8">Level {level} {t('levelComplete')}</p>
           <div className="flex gap-4 justify-center">
-            <Button variant="outline" size="lg" onClick={onBack}>Kembali</Button>
+            <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
             {level < gameProgress.maxLevel && (
-              <Button size="lg" onClick={handleNextLevel}>Level Berikutnya →</Button>
+              <Button size="lg" onClick={handleNextLevel}>{t('nextLevel')}</Button>
             )}
           </div>
         </motion.div>
@@ -144,8 +148,8 @@ export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
-              <h1 className="text-2xl font-black text-foreground">🎨 Pixel Art</h1>
-              <p className="text-muted-foreground">Buat gambar sesuai pola!</p>
+              <h1 className="text-2xl font-black text-foreground">🎨 {t('pixelArt')}</h1>
+              <p className="text-muted-foreground">{t('createPattern')}</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={onLevelSelect}>Level {level}</Button>
@@ -154,14 +158,14 @@ export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
         {/* Hint */}
         <Card className="mb-6 bg-primary/10">
           <CardContent className="p-4 text-center">
-            <p className="text-lg font-semibold">💡 {pattern.hint}</p>
+            <p className="text-lg font-semibold">💡 {lang === 'id' ? pattern.hintId : pattern.hintEn}</p>
           </CardContent>
         </Card>
 
         {/* Target Pattern (small preview) */}
         <div className="flex justify-center mb-4">
           <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-2">Pola Target:</p>
+            <p className="text-sm text-muted-foreground mb-2">{t('targetPattern')}</p>
             <div 
               className="grid gap-0.5 mx-auto border rounded-lg p-1 bg-muted/30"
               style={{ gridTemplateColumns: `repeat(${pattern.size}, 1fr)` }}
@@ -208,7 +212,7 @@ export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
         {/* Color Palette */}
         <Card className="mb-6">
           <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground mb-3 text-center">Pilih Warna:</p>
+            <p className="text-sm text-muted-foreground mb-3 text-center">{t('chooseColor')}</p>
             <div className="flex justify-center gap-3">
               {colors.map((color, i) => (
                 <motion.div
@@ -231,10 +235,10 @@ export const PixelArtGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
 
         <div className="flex gap-4">
           <Button variant="outline" size="lg" onClick={resetGrid} className="flex-1">
-            <RotateCcw className="w-5 h-5 mr-2" /> Reset
+            <RotateCcw className="w-5 h-5 mr-2" /> {t('reset')}
           </Button>
           <Button size="lg" onClick={checkPattern} className="flex-1">
-            Periksa ✓
+            {t('check')}
           </Button>
         </div>
       </div>

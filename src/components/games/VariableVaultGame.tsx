@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface VariableVaultGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -83,19 +84,19 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
   const levelData = [
     {
       code: 'SET x = 5\nPRINT x',
-      question: 'What does x equal?',
+      question: 'x = ?',
       options: ['3', '5', '10'],
       correct: 1,
     },
     {
       code: 'SET a = 3\nSET b = 7\nSET c = a + b\nPRINT c',
-      question: 'What does c equal?',
+      question: 'c = ?',
       options: ['3', '7', '10'],
       correct: 2,
     },
     {
       code: 'SET score = 0\nscore = score + 10\nscore = score + 5\nPRINT score',
-      question: 'What does score equal?',
+      question: 'score = ?',
       options: ['10', '15', '5'],
       correct: 1,
     },
@@ -135,8 +136,8 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Variable Virtuoso! 📦" 
-        message="You understand variables!"
+        title={t('variableVirtuoso')}
+        message={t('youUnderstandVariables')}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -146,8 +147,8 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="📦 Variable Vault"
-          subtitle="Track the variable values!"
+          title={`📦 ${t('variableVault')}`}
+          subtitle={t('variableVaultDesc')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -155,7 +156,7 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
 
         <Card variant="game" className="mb-6">
           <CardContent className="p-6">
-            <p className="text-lg font-semibold mb-4">Trace this code:</p>
+            <p className="text-lg font-semibold mb-4">{t('traceCode')}</p>
             <div className="bg-muted rounded-2xl p-4 font-mono text-lg whitespace-pre-line">
               {currentLevel.code}
             </div>
@@ -196,7 +197,7 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
             animate={{ opacity: 1 }}
             className="text-center text-destructive font-semibold mb-4"
           >
-            Try again! Trace through the code step by step.
+            {t('tryAgainTrace')}
           </motion.p>
         )}
 
@@ -206,7 +207,7 @@ export const VariableVaultGame = ({ onBack, level, onLevelSelect, gameId }: Vari
           onClick={handleSubmit}
           disabled={selectedAnswer === null || showFeedback}
         >
-          Check Answer ✓
+          {t('checkAnswer')}
         </Button>
       </div>
     </div>
