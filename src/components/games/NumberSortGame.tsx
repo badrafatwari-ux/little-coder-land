@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface NumberSortGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -80,6 +81,8 @@ const CompletionScreen = ({
 );
 
 export const NumberSortGame = ({ onBack, level, onLevelSelect, gameId }: NumberSortGameProps) => {
+  const lang = getLanguage();
+  
   const levelData = [
     { numbers: [3, 1, 2], mode: 'asc' as const },
     { numbers: [5, 2, 8, 1, 4], mode: 'asc' as const },
@@ -133,8 +136,8 @@ export const NumberSortGame = ({ onBack, level, onLevelSelect, gameId }: NumberS
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Sorting Success! 📊" 
-        message={`Sorted in ${moves} swaps!`}
+        title={t('sortingSuccess')}
+        message={`${lang === 'id' ? 'Diurutkan dalam' : 'Sorted in'} ${moves} ${t('swaps')}!`}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -144,8 +147,8 @@ export const NumberSortGame = ({ onBack, level, onLevelSelect, gameId }: NumberS
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="📊 Number Sort"
-          subtitle={`Sort ${currentLevel.mode === 'asc' ? 'smallest to largest' : 'largest to smallest'}!`}
+          title={`📊 ${t('numberSort')}`}
+          subtitle={currentLevel.mode === 'asc' ? t('sortSmallestLargest') : t('sortLargestSmallest')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -154,12 +157,12 @@ export const NumberSortGame = ({ onBack, level, onLevelSelect, gameId }: NumberS
         <Card variant="game" className="mb-6">
           <CardContent className="p-6">
             <p className="text-lg font-semibold mb-4 text-center">
-              Tap two numbers to swap them!
+              {t('tapToSwap')}
             </p>
             <p className="text-muted-foreground text-center mb-4">
-              Goal: {currentLevel.mode === 'asc' ? '1 → 2 → 3 → ...' : '... → 3 → 2 → 1'}
+              {t('goal')}: {currentLevel.mode === 'asc' ? '1 → 2 → 3 → ...' : '... → 3 → 2 → 1'}
             </p>
-            <p className="text-center font-mono text-sm">Swaps: {moves}</p>
+            <p className="text-center font-mono text-sm">{t('swaps')}: {moves}</p>
           </CardContent>
         </Card>
 
@@ -193,7 +196,7 @@ export const NumberSortGame = ({ onBack, level, onLevelSelect, gameId }: NumberS
               setMoves(0);
             }}
           >
-            Shuffle 🔀
+            {t('shuffle')}
           </Button>
         </div>
       </div>

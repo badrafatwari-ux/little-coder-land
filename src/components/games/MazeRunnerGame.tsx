@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface MazeRunnerGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -182,8 +183,8 @@ export const MazeRunnerGame = ({ onBack, level, onLevelSelect, gameId }: MazeRun
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Maze Master! 🏃" 
-        message={`Solved in ${commands.length} moves!`}
+        title={t('mazeMaster')}
+        message={`${t('solvedIn')} ${commands.length} ${t('moves')}!`}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -193,8 +194,8 @@ export const MazeRunnerGame = ({ onBack, level, onLevelSelect, gameId }: MazeRun
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="🏃 Maze Runner"
-          subtitle="Program the robot to reach the flag!"
+          title={`🏃 ${t('mazeRunner')}`}
+          subtitle={t('programRobot')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -228,8 +229,8 @@ export const MazeRunnerGame = ({ onBack, level, onLevelSelect, gameId }: MazeRun
         <Card variant="lesson" className="mb-6">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold">Commands:</p>
-              <Button variant="ghost" size="sm" onClick={() => setCommands([])}>Clear</Button>
+              <p className="font-semibold">{t('commands')}:</p>
+              <Button variant="ghost" size="sm" onClick={() => setCommands([])}>{t('clear')}</Button>
             </div>
             <div className="min-h-[40px] bg-muted rounded-xl p-2 flex flex-wrap gap-1">
               {commands.map((cmd, i) => (
@@ -238,17 +239,17 @@ export const MazeRunnerGame = ({ onBack, level, onLevelSelect, gameId }: MazeRun
                 </span>
               ))}
               {commands.length === 0 && (
-                <span className="text-muted-foreground">Add commands below...</span>
+                <span className="text-muted-foreground">{t('addCommands')}</span>
               )}
             </div>
           </CardContent>
         </Card>
 
         <div className="grid grid-cols-4 gap-2 mb-6">
-          <Button variant="outline" onClick={() => addCommand('up')} disabled={isRunning}>⬆️ Up</Button>
-          <Button variant="outline" onClick={() => addCommand('down')} disabled={isRunning}>⬇️ Down</Button>
-          <Button variant="outline" onClick={() => addCommand('left')} disabled={isRunning}>⬅️ Left</Button>
-          <Button variant="outline" onClick={() => addCommand('right')} disabled={isRunning}>➡️ Right</Button>
+          <Button variant="outline" onClick={() => addCommand('up')} disabled={isRunning}>⬆️ {t('up')}</Button>
+          <Button variant="outline" onClick={() => addCommand('down')} disabled={isRunning}>⬇️ {t('down')}</Button>
+          <Button variant="outline" onClick={() => addCommand('left')} disabled={isRunning}>⬅️ {t('left')}</Button>
+          <Button variant="outline" onClick={() => addCommand('right')} disabled={isRunning}>➡️ {t('right')}</Button>
         </div>
 
         <Button 
@@ -257,7 +258,7 @@ export const MazeRunnerGame = ({ onBack, level, onLevelSelect, gameId }: MazeRun
           onClick={runProgram}
           disabled={commands.length === 0 || isRunning}
         >
-          {isRunning ? 'Running...' : 'Run ▶️'}
+          {isRunning ? t('running') : t('run')}
         </Button>
       </div>
     </div>

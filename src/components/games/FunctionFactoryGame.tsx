@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface FunctionFactoryGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -80,22 +81,24 @@ const CompletionScreen = ({
 );
 
 export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: FunctionFactoryGameProps) => {
+  const lang = getLanguage();
+  
   const levelData = [
     {
       name: 'double',
-      description: 'DOUBLE the input number',
+      description: lang === 'id' ? 'KALIKAN input dengan 2' : 'DOUBLE the input number',
       inputs: [2, 5],
       correctOutputs: [4, 10],
     },
     {
       name: 'addFive',
-      description: 'ADD 5 to the input',
+      description: lang === 'id' ? 'TAMBAH 5 ke input' : 'ADD 5 to the input',
       inputs: [3, 10, 0],
       correctOutputs: [8, 15, 5],
     },
     {
       name: 'triple_minus_one',
-      description: 'TRIPLE the input, then SUBTRACT 1',
+      description: lang === 'id' ? 'KALIKAN 3, lalu KURANGI 1' : 'TRIPLE the input, then SUBTRACT 1',
       inputs: [2, 4, 5],
       correctOutputs: [5, 11, 14],
     },
@@ -145,8 +148,8 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Function Master! ⚡" 
-        message={`${score}/${currentLevel.inputs.length} correct!`}
+        title={t('functionMaster')}
+        message={`${score}/${currentLevel.inputs.length} ${lang === 'id' ? 'benar!' : 'correct!'}`}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -156,8 +159,8 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="⚡ Function Factory"
-          subtitle="Predict the function output!"
+          title={`⚡ ${t('functionFactory')}`}
+          subtitle={t('functionFactoryDesc')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -172,7 +175,7 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
             </div>
             
             <p className="text-center text-lg">
-              Question {currentInput + 1} of {currentLevel.inputs.length}
+              {t('question')} {currentInput + 1} {t('of')} {currentLevel.inputs.length}
             </p>
           </CardContent>
         </Card>
@@ -181,7 +184,7 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-8">
               <div className="text-center">
-                <p className="text-muted-foreground text-sm mb-2">INPUT</p>
+                <p className="text-muted-foreground text-sm mb-2">{t('inputValue')}</p>
                 <div className="w-20 h-20 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-3xl font-black">
                   {currentLevel.inputs[currentInput]}
                 </div>
@@ -196,7 +199,7 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
               </motion.div>
               
               <div className="text-center">
-                <p className="text-muted-foreground text-sm mb-2">OUTPUT</p>
+                <p className="text-muted-foreground text-sm mb-2">{t('outputValue')}</p>
                 <input
                   type="number"
                   value={userAnswer}
@@ -221,7 +224,7 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
               showFeedback === 'correct' ? 'text-success' : 'text-destructive'
             }`}
           >
-            {showFeedback === 'correct' ? '✓ Correct!' : `✗ Answer: ${currentLevel.correctOutputs[currentInput]}`}
+            {showFeedback === 'correct' ? `✓ ${t('correct')}!` : `✗ ${lang === 'id' ? 'Jawaban' : 'Answer'}: ${currentLevel.correctOutputs[currentInput]}`}
           </motion.div>
         )}
 
@@ -231,7 +234,7 @@ export const FunctionFactoryGame = ({ onBack, level, onLevelSelect, gameId }: Fu
           onClick={handleSubmit}
           disabled={!userAnswer || showFeedback !== null}
         >
-          Check Output ✓
+          {t('checkOutput')}
         </Button>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { completeGameLevel, getGameLevel } from '@/lib/progress';
 import { playCorrect, playWrong, playGameComplete, playStar, playClick } from '@/lib/sounds';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface GameProps {
   onBack: () => void;
@@ -25,6 +26,7 @@ const levelCodes = [
 ];
 
 export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const lang = getLanguage();
   const codes = levelCodes[Math.min(level - 1, levelCodes.length - 1)];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [typed, setTyped] = useState('');
@@ -96,18 +98,18 @@ export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GamePro
       <div className="min-h-screen p-6 flex flex-col items-center justify-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-center">
           <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Coder Cepat! ⌨️</h2>
+          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">{t('fastCoder')}</h2>
           <StarDisplay count={earnedStars} maxStars={3} size="lg" animated />
           <p className="text-xl text-muted-foreground mt-4 mb-2">
-            Kata selesai: {score}/{codes.length}
+            {t('wordsCompleted')} {score}/{codes.length}
           </p>
           <p className="text-muted-foreground mb-8">
-            Kesalahan ketik: {errors}
+            {t('typingErrors')} {errors}
           </p>
           <div className="flex gap-4 justify-center">
-            <Button variant="outline" size="lg" onClick={onBack}>Kembali</Button>
+            <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
             {level < gameProgress.maxLevel && (
-              <Button size="lg" onClick={handleNextLevel}>Level Berikutnya →</Button>
+              <Button size="lg" onClick={handleNextLevel}>{t('nextLevel')}</Button>
             )}
           </div>
         </motion.div>
@@ -124,8 +126,8 @@ export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GamePro
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
-              <h1 className="text-2xl font-black text-foreground">⌨️ Typing Code</h1>
-              <p className="text-muted-foreground">Ketik kode dengan benar!</p>
+              <h1 className="text-2xl font-black text-foreground">⌨️ {t('typingCode')}</h1>
+              <p className="text-muted-foreground">{t('typingCodeDesc')}</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={onLevelSelect}>Level {level}</Button>
@@ -140,13 +142,13 @@ export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GamePro
         </div>
 
         <div className="text-center mb-4">
-          <span className="text-muted-foreground">Kata {currentIndex + 1} dari {codes.length}</span>
+          <span className="text-muted-foreground">{t('word')} {currentIndex + 1} {t('of')} {codes.length}</span>
         </div>
 
         {/* Code to type */}
         <Card className={`mb-6 transition-all ${showError ? 'ring-4 ring-destructive' : ''}`}>
           <CardContent className="p-8 text-center">
-            <p className="text-sm text-muted-foreground mb-4">Ketik kode ini:</p>
+            <p className="text-sm text-muted-foreground mb-4">{t('typeThisCode')}</p>
             <motion.div
               key={currentIndex}
               initial={{ scale: 0.8, opacity: 0 }}
@@ -182,7 +184,7 @@ export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GamePro
               value={typed}
               onChange={handleChange}
               className="w-full text-2xl font-mono text-center bg-transparent border-none outline-none p-4"
-              placeholder="Mulai ketik di sini..."
+              placeholder={t('startTypingHere')}
               autoComplete="off"
               autoCapitalize="off"
             />
@@ -193,11 +195,11 @@ export const TypingCodeGame = ({ onBack, level, onLevelSelect, gameId }: GamePro
         <div className="flex justify-center gap-8 text-center">
           <div>
             <p className="text-2xl font-bold text-success">{score}</p>
-            <p className="text-sm text-muted-foreground">Benar</p>
+            <p className="text-sm text-muted-foreground">{t('correct')}</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-destructive">{errors}</p>
-            <p className="text-sm text-muted-foreground">Kesalahan</p>
+            <p className="text-sm text-muted-foreground">{t('errors')}</p>
           </div>
         </div>
       </div>

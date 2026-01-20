@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface ArrayAdventureGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -83,19 +84,19 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
   const levelData = [
     {
       array: ['🍎', '🍊', '🍋'],
-      question: 'What is at index [1]?',
+      question: 'index [1] = ?',
       options: ['🍎', '🍊', '🍋'],
       correct: 1,
     },
     {
       array: ['🐶', '🐱', '🐰', '🐻'],
-      question: 'What is at index [3]?',
+      question: 'index [3] = ?',
       options: ['🐶', '🐰', '🐻'],
       correct: 2,
     },
     {
       array: ['⭐', '🌙', '☀️', '🌈', '❄️'],
-      question: 'At what index is 🌈?',
+      question: '🌈 = index ?',
       options: ['2', '3', '4'],
       correct: 1,
     },
@@ -135,8 +136,8 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Array Ace! 📋" 
-        message="You understand arrays!"
+        title={t('arrayAce')}
+        message={t('youUnderstandArrays')}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -146,8 +147,8 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="📋 Array Adventure"
-          subtitle="Learn array indexing!"
+          title={`📋 ${t('arrayAdventure')}`}
+          subtitle={t('arrayAdventureDesc')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -155,7 +156,7 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
 
         <Card variant="game" className="mb-6">
           <CardContent className="p-6">
-            <p className="text-lg font-semibold mb-4 text-center">The Array:</p>
+            <p className="text-lg font-semibold mb-4 text-center">{t('theArray')}</p>
             <div className="flex justify-center gap-2 mb-4">
               {currentLevel.array.map((item, index) => (
                 <motion.div
@@ -173,7 +174,7 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
               ))}
             </div>
             <p className="text-center text-muted-foreground text-sm">
-              Remember: Arrays start at index 0!
+              {t('arrayStartAtZero')}
             </p>
           </CardContent>
         </Card>
@@ -212,7 +213,7 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
             animate={{ opacity: 1 }}
             className="text-center text-destructive font-semibold mb-4"
           >
-            Try again! Remember: counting starts at 0.
+            {t('tryAgainArray')}
           </motion.p>
         )}
 
@@ -222,7 +223,7 @@ export const ArrayAdventureGame = ({ onBack, level, onLevelSelect, gameId }: Arr
           onClick={handleSubmit}
           disabled={selectedAnswer === null || showFeedback}
         >
-          Check Answer ✓
+          {t('checkAnswer')}
         </Button>
       </div>
     </div>

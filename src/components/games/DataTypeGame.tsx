@@ -7,6 +7,7 @@ import { completeGameLevel, getGameLevel } from '@/lib/progress';
 import { playCorrect, playWrong, playGameComplete, playStar, playClick } from '@/lib/sounds';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface GameProps {
   onBack: () => void;
@@ -15,42 +16,44 @@ interface GameProps {
   gameId: string;
 }
 
-const dataTypes = [
-  { id: 'number', label: 'Angka', icon: '🔢', color: 'bg-blue-500' },
-  { id: 'string', label: 'Teks', icon: '📝', color: 'bg-green-500' },
-  { id: 'boolean', label: 'Benar/Salah', icon: '✅', color: 'bg-yellow-500' },
-  { id: 'array', label: 'Daftar', icon: '📋', color: 'bg-purple-500' },
-];
-
-const levelItems = [
-  // Level 1 - Easy
-  [
-    { value: '42', type: 'number', display: '42' },
-    { value: '"Hello"', type: 'string', display: '"Hello"' },
-    { value: 'true', type: 'boolean', display: 'true' },
-    { value: '100', type: 'number', display: '100' },
-    { value: '"Budi"', type: 'string', display: '"Budi"' },
-  ],
-  // Level 2 - Medium
-  [
-    { value: 'false', type: 'boolean', display: 'false' },
-    { value: '[1, 2, 3]', type: 'array', display: '[1, 2, 3]' },
-    { value: '3.14', type: 'number', display: '3.14' },
-    { value: '"123"', type: 'string', display: '"123"' },
-    { value: '["a", "b"]', type: 'array', display: '["a", "b"]' },
-  ],
-  // Level 3 - Hard
-  [
-    { value: '[true, false]', type: 'array', display: '[true, false]' },
-    { value: '"true"', type: 'string', display: '"true"' },
-    { value: '0', type: 'number', display: '0' },
-    { value: '[]', type: 'array', display: '[]' },
-    { value: '"3.14"', type: 'string', display: '"3.14"' },
-    { value: 'false', type: 'boolean', display: 'false' },
-  ],
-];
-
 export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps) => {
+  const lang = getLanguage();
+  
+  const dataTypes = [
+    { id: 'number', label: t('number'), icon: '🔢', color: 'bg-blue-500' },
+    { id: 'string', label: t('text'), icon: '📝', color: 'bg-green-500' },
+    { id: 'boolean', label: t('boolean'), icon: '✅', color: 'bg-yellow-500' },
+    { id: 'array', label: t('list'), icon: '📋', color: 'bg-purple-500' },
+  ];
+
+  const levelItems = [
+    // Level 1 - Easy
+    [
+      { value: '42', type: 'number', display: '42' },
+      { value: '"Hello"', type: 'string', display: '"Hello"' },
+      { value: 'true', type: 'boolean', display: 'true' },
+      { value: '100', type: 'number', display: '100' },
+      { value: '"Budi"', type: 'string', display: '"Budi"' },
+    ],
+    // Level 2 - Medium
+    [
+      { value: 'false', type: 'boolean', display: 'false' },
+      { value: '[1, 2, 3]', type: 'array', display: '[1, 2, 3]' },
+      { value: '3.14', type: 'number', display: '3.14' },
+      { value: '"123"', type: 'string', display: '"123"' },
+      { value: '["a", "b"]', type: 'array', display: '["a", "b"]' },
+    ],
+    // Level 3 - Hard
+    [
+      { value: '[true, false]', type: 'array', display: '[true, false]' },
+      { value: '"true"', type: 'string', display: '"true"' },
+      { value: '0', type: 'number', display: '0' },
+      { value: '[]', type: 'array', display: '[]' },
+      { value: '"3.14"', type: 'string', display: '"3.14"' },
+      { value: 'false', type: 'boolean', display: 'false' },
+    ],
+  ];
+  
   const items = levelItems[Math.min(level - 1, levelItems.length - 1)];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -109,15 +112,15 @@ export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
       <div className="min-h-screen p-6 flex flex-col items-center justify-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-center">
           <Mascot mood="celebrating" size="lg" />
-          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">Ahli Tipe Data! 📊</h2>
+          <h2 className="text-3xl font-black text-foreground mt-6 mb-4">{t('dataTypeExpert')}</h2>
           <StarDisplay count={earnedStars} maxStars={3} size="lg" animated />
           <p className="text-xl text-muted-foreground mt-4 mb-8">
-            Skor: {score + (selected === currentItem.type ? 1 : 0)}/{items.length}
+            {t('score')} {score + (selected === currentItem.type ? 1 : 0)}/{items.length}
           </p>
           <div className="flex gap-4 justify-center">
-            <Button variant="outline" size="lg" onClick={onBack}>Kembali</Button>
+            <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
             {level < gameProgress.maxLevel && (
-              <Button size="lg" onClick={handleNextLevel}>Level Berikutnya →</Button>
+              <Button size="lg" onClick={handleNextLevel}>{t('nextLevel')}</Button>
             )}
           </div>
         </motion.div>
@@ -134,8 +137,8 @@ export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div>
-              <h1 className="text-2xl font-black text-foreground">📊 Data Types</h1>
-              <p className="text-muted-foreground">Tentukan tipe data!</p>
+              <h1 className="text-2xl font-black text-foreground">📊 {t('dataTypes')}</h1>
+              <p className="text-muted-foreground">{t('dataTypesDesc')}</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={onLevelSelect}>Level {level}</Button>
@@ -152,7 +155,7 @@ export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
         {/* Value to identify */}
         <Card className="mb-6">
           <CardContent className="p-8 text-center">
-            <p className="text-sm text-muted-foreground mb-4">Apa tipe data dari nilai ini?</p>
+            <p className="text-sm text-muted-foreground mb-4">{t('whatDataType')}</p>
             <motion.div
               key={currentIndex}
               initial={{ scale: 0.8, opacity: 0 }}
@@ -199,7 +202,7 @@ export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
         <Card className="mb-6 bg-muted/30">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground text-center">
-              💡 Petunjuk: Teks selalu ada di dalam tanda kutip "..."
+              {t('textHint')}
             </p>
           </CardContent>
         </Card>
@@ -208,7 +211,7 @@ export const DataTypeGame = ({ onBack, level, onLevelSelect, gameId }: GameProps
         {showResult && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Button size="lg" className="w-full" onClick={handleNext}>
-              {currentIndex < items.length - 1 ? 'Pertanyaan Berikutnya →' : 'Lihat Hasil'}
+              {currentIndex < items.length - 1 ? t('nextQuestion') : t('seeResult')}
             </Button>
           </motion.div>
         )}

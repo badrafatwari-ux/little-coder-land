@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t } from '@/lib/i18n';
 
 interface MemoryMatchGameProps {
   onBack: () => void;
@@ -78,9 +79,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -187,8 +188,8 @@ export const MemoryMatchGame = ({ onBack, level, onLevelSelect, gameId }: Memory
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Memory Master! 🧠" 
-        message={`Completed in ${moves} moves!`}
+        title={t('memoryMaster')}
+        message={`${t('completedIn')} ${moves} ${t('moves')}!`}
         hasNextLevel={level < gameProgress.maxLevel}
       />
     );
@@ -198,15 +199,15 @@ export const MemoryMatchGame = ({ onBack, level, onLevelSelect, gameId }: Memory
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="🧠 Memory Match"
-          subtitle="Match code symbols with their names!"
+          title={`🧠 ${t('memoryMatch')}`}
+          subtitle={t('matchSymbols')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
         />
 
         <div className="text-center mb-4">
-          <span className="text-lg font-semibold">Moves: {moves}</span>
+          <span className="text-lg font-semibold">{t('movesCount')} {moves}</span>
         </div>
 
         <div className={`grid gap-3 ${currentLevelPairs.length <= 3 ? 'grid-cols-3' : currentLevelPairs.length <= 4 ? 'grid-cols-4' : 'grid-cols-4'}`}>
@@ -239,7 +240,7 @@ export const MemoryMatchGame = ({ onBack, level, onLevelSelect, gameId }: Memory
             setMoves(0);
           }}
         >
-          Restart 🔄
+          {t('restart')}
         </Button>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { getGameLevel, completeGameLevel } from '@/lib/progress';
 import { StarDisplay } from '@/components/StarDisplay';
 import { Mascot } from '@/components/Mascot';
 import { playTap, playCorrect, playWrong, playGameComplete, playStar } from '@/lib/sounds';
+import { t, getLanguage } from '@/lib/i18n';
 
 interface BinaryBasicsGameProps {
   onBack: () => void;
@@ -70,9 +71,9 @@ const CompletionScreen = ({
       <StarDisplay count={stars} maxStars={3} size="lg" animated />
       <p className="text-xl text-muted-foreground mt-4 mb-8">{message}</p>
       <div className="flex gap-4 justify-center">
-        <Button variant="outline" size="lg" onClick={onBack}>Back to Games</Button>
+        <Button variant="outline" size="lg" onClick={onBack}>{t('backToGames')}</Button>
         {hasNextLevel && onNextLevel && (
-          <Button size="lg" onClick={onNextLevel}>Next Level →</Button>
+          <Button size="lg" onClick={onNextLevel}>{t('nextLevel')}</Button>
         )}
       </div>
     </motion.div>
@@ -80,24 +81,26 @@ const CompletionScreen = ({
 );
 
 export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: BinaryBasicsGameProps) => {
+  const lang = getLanguage();
+  
   const levelData = [
     {
-      question: 'What is 1 + 1 in binary?',
+      question: lang === 'id' ? '1 + 1 dalam binary = ?' : 'What is 1 + 1 in binary?',
       options: ['01', '10', '11'],
       correct: 1,
-      explanation: '1 + 1 = 2, which is 10 in binary!',
+      explanation: lang === 'id' ? '1 + 1 = 2, yaitu 10 dalam binary!' : '1 + 1 = 2, which is 10 in binary!',
     },
     {
-      question: 'Convert 5 to binary:',
+      question: lang === 'id' ? 'Ubah 5 ke binary:' : 'Convert 5 to binary:',
       options: ['100', '101', '110'],
       correct: 1,
-      explanation: '5 = 4 + 1 = 101 in binary!',
+      explanation: lang === 'id' ? '5 = 4 + 1 = 101 dalam binary!' : '5 = 4 + 1 = 101 in binary!',
     },
     {
-      question: 'What is binary 1010 in decimal?',
+      question: lang === 'id' ? 'Binary 1010 = ? (desimal)' : 'What is binary 1010 in decimal?',
       options: ['8', '10', '12'],
       correct: 1,
-      explanation: '1010 = 8 + 0 + 2 + 0 = 10!',
+      explanation: lang === 'id' ? '1010 = 8 + 0 + 2 + 0 = 10!' : '1010 = 8 + 0 + 2 + 0 = 10!',
     },
   ];
 
@@ -135,7 +138,7 @@ export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: Binar
       <CompletionScreen 
         onBack={onBack} 
         stars={earned} 
-        title="Binary Boss! 🔢" 
+        title={t('binaryBoss')}
         message={currentLevel.explanation}
         hasNextLevel={level < gameProgress.maxLevel}
       />
@@ -146,8 +149,8 @@ export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: Binar
     <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         <GameHeader
-          title="🔢 Binary Basics"
-          subtitle="Learn the language of computers!"
+          title={`🔢 ${t('binaryBasics')}`}
+          subtitle={t('learnBinary')}
           level={level}
           onBack={onBack}
           onLevelSelect={onLevelSelect}
@@ -155,11 +158,11 @@ export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: Binar
 
         <Card variant="game" className="mb-6">
           <CardContent className="p-6 text-center">
-            <p className="text-lg mb-4">Binary uses only 0s and 1s!</p>
+            <p className="text-lg mb-4">{lang === 'id' ? 'Binary hanya menggunakan 0 dan 1!' : 'Binary uses only 0s and 1s!'}</p>
             <div className="bg-muted rounded-2xl p-4 font-mono inline-block">
-              <span className="text-primary">1 = 💡 ON</span>
+              <span className="text-primary">{t('binaryOn')}</span>
               <span className="mx-4">|</span>
-              <span className="text-muted-foreground">0 = 💡 OFF</span>
+              <span className="text-muted-foreground">{t('binaryOff')}</span>
             </div>
           </CardContent>
         </Card>
@@ -198,7 +201,7 @@ export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: Binar
             animate={{ opacity: 1 }}
             className="text-center text-destructive font-semibold mb-4"
           >
-            Not quite! Think about place values: 1, 2, 4, 8...
+            {t('thinkPlaceValues')}
           </motion.p>
         )}
 
@@ -208,7 +211,7 @@ export const BinaryBasicsGame = ({ onBack, level, onLevelSelect, gameId }: Binar
           onClick={handleSubmit}
           disabled={selectedAnswer === null || showFeedback}
         >
-          Check Answer ✓
+          {t('checkAnswer')}
         </Button>
       </div>
     </div>
