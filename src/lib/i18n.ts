@@ -392,36 +392,36 @@ export const translations = {
     next: 'Lanjut →',
     complete: 'Selesai! ⭐',
     
-    // Lessons
+    // Lessons - Programming terms stay in English!
     lessonProgram: 'Apa itu Program?',
     lessonProgramDesc: 'Pelajari apa itu program dan cara kerjanya',
     lessonProgramExplanation: 'Program itu seperti resep untuk komputer! Sama seperti resep yang memberi tahu langkah demi langkah cara membuat kue, program memberi tahu komputer apa yang harus dilakukan.',
     lessonProgramExample: 'Saat kamu bermain game, program memberi tahu komputer untuk menampilkan gambar, memutar suara, dan merespons saat kamu menekan tombol!',
     lessonProgramInteractive: 'Bayangkan rutinitas pagi sebagai program: Bangun tidur → Sikat gigi → Sarapan → Berpakaian → Pergi sekolah!',
     
-    lessonSequence: 'Urutan',
+    lessonSequence: 'Sequence',
     lessonSequenceDesc: 'Langkah yang terjadi satu per satu',
-    lessonSequenceExplanation: 'Urutan adalah ketika hal-hal terjadi secara berurutan, satu langkah pada satu waktu. Komputer mengikuti instruksi dari atas ke bawah!',
+    lessonSequenceExplanation: 'Sequence adalah ketika hal-hal terjadi secara berurutan, satu langkah pada satu waktu. Komputer mengikuti instruksi dari atas ke bawah!',
     lessonSequenceExample: 'Membuat roti lapis: 1. Ambil roti 2. Tambah selai kacang 3. Tambah jeli 4. Tutup dengan roti',
     lessonSequenceInteractive: 'Urutan itu penting! Kamu tidak bisa makan roti lapis sebelum membuatnya!',
     
-    lessonLoops: 'Perulangan',
+    lessonLoops: 'Loop',
     lessonLoopsDesc: 'Mengulang aksi berulang kali',
-    lessonLoopsExplanation: 'Perulangan mengulang aksi yang sama berkali-kali. Daripada menulis hal yang sama 10 kali, kita pakai perulangan!',
-    lessonLoopsExample: 'Sikat gigi: Ulangi 30 kali → Gerakkan sikat naik turun',
-    lessonLoopsInteractive: 'Bayangkan menggambar 100 bintang. Dengan perulangan, cukup bilang "gambar bintang, ulangi 100 kali"!',
+    lessonLoopsExplanation: 'Loop mengulang aksi yang sama berkali-kali. Daripada menulis hal yang sama 10 kali, kita pakai loop!',
+    lessonLoopsExample: 'Sikat gigi: Repeat 30 kali → Gerakkan sikat naik turun',
+    lessonLoopsInteractive: 'Bayangkan menggambar 100 bintang. Dengan loop, cukup bilang "draw star, repeat 100 times"!',
     
-    lessonConditions: 'Jika / Lainnya',
+    lessonConditions: 'If / Else',
     lessonConditionsDesc: 'Membuat keputusan dalam kode',
-    lessonConditionsExplanation: 'Kondisi memungkinkan komputer membuat pilihan. JIKA sesuatu benar, lakukan satu hal. LAINNYA, lakukan hal berbeda!',
-    lessonConditionsExample: 'JIKA hujan → Bawa payung, LAINNYA → Pakai kacamata hitam',
-    lessonConditionsInteractive: 'Game pakai kondisi: JIKA pemain menyentuh koin → Tambah poin, JIKA pemain menyentuh musuh → Kurangi nyawa',
+    lessonConditionsExplanation: 'Condition memungkinkan komputer membuat pilihan. IF sesuatu benar, lakukan satu hal. ELSE, lakukan hal berbeda!',
+    lessonConditionsExample: 'IF hujan → Bawa payung, ELSE → Pakai kacamata hitam',
+    lessonConditionsInteractive: 'Game pakai condition: IF player menyentuh coin → Tambah poin, IF player menyentuh enemy → Kurangi nyawa',
     
-    lessonVariables: 'Variabel',
+    lessonVariables: 'Variable',
     lessonVariablesDesc: 'Kotak yang menyimpan informasi',
-    lessonVariablesExplanation: 'Variabel seperti kotak berlabel yang menyimpan sesuatu. Kamu bisa memasukkan, mengeluarkan, dan mengubah isinya!',
-    lessonVariablesExample: 'skor = 0 (kotak bernama "skor" berisi 0). Saat dapat poin: skor = skor + 1',
-    lessonVariablesInteractive: 'Namamu disimpan dalam variabel! namaPemain = "Budi"',
+    lessonVariablesExplanation: 'Variable seperti kotak berlabel yang menyimpan sesuatu. Kamu bisa memasukkan, mengeluarkan, dan mengubah isinya!',
+    lessonVariablesExample: 'score = 0 (kotak bernama "score" berisi 0). Saat dapat poin: score = score + 1',
+    lessonVariablesInteractive: 'Namamu disimpan dalam variable! playerName = "Budi"',
     
     // Play page
     playGames: 'Main Game',
