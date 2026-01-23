@@ -113,6 +113,14 @@ export const translations = {
     gameTypingCodeDesc: 'Type code fast!',
     gameDataType: 'Data Type',
     gameDataTypeDesc: 'Sort by data types!',
+    gameStringBuilder: 'String Builder',
+    gameStringBuilderDesc: 'Combine strings together!',
+    gameDebugDetective: 'Debug Detective',
+    gameDebugDetectiveDesc: 'Find the bug in the code!',
+    gameCounterChallenge: 'Counter Challenge',
+    gameCounterChallengeDesc: 'Reach the target number!',
+    gameLogicGate: 'Logic Gate',
+    gameLogicGateDesc: 'Learn AND, OR, NOT logic!',
     
     // Quiz page
     quizTime: 'Quiz Time!',
@@ -368,6 +376,40 @@ export const translations = {
     traceCode: 'Trace the code carefully!',
     tryAgainTrace: 'Try again! Follow each line step by step.',
     
+    // String Builder
+    stringBuilder: 'String Builder',
+    combineStrings: 'Combine strings together!',
+    stringMaster: 'String Master!',
+    youUnderstandStrings: 'You understand string concatenation!',
+    whatResultWhenCombine: 'What is the result when you combine these?',
+    tryAgainString: 'Try again! Think about how strings join together.',
+    
+    // Debug Detective
+    debugDetective: 'Debug Detective',
+    findTheBug: 'Find the bug in the code!',
+    debugMaster: 'Debug Master!',
+    youFoundBug: 'You found the bug!',
+    expected: 'Expected',
+    actual: 'Actual',
+    whichLineHasBug: 'Which line has the bug?',
+    findBug: 'Find Bug',
+    
+    // Counter Challenge
+    counterChallenge: 'Counter Challenge',
+    reachTheTarget: 'Reach the target number!',
+    counterChampion: 'Counter Champion!',
+    reachedTarget: 'Reached target in',
+    timeUp: 'Time Up!',
+    tryAgainCounter: 'Try again! Be faster next time.',
+    target: 'Target',
+    currentValue: 'Current Value',
+    movesUsed: 'Moves used',
+    
+    // Logic Gate
+    logicGate: 'Logic Gate',
+    solveLogicGates: 'Solve the logic gates!',
+    logicMaster: 'Logic Master!',
+    
     // Shared game UI
     locked: 'Locked',
     stars: 'Stars',
@@ -472,6 +514,14 @@ export const translations = {
     gameTypingCodeDesc: 'Ketik kode dengan cepat!',
     gameDataType: 'Tipe Data',
     gameDataTypeDesc: 'Sortir berdasarkan tipe data!',
+    gameStringBuilder: 'String Builder',
+    gameStringBuilderDesc: 'Gabungkan string bersama!',
+    gameDebugDetective: 'Detektif Debug',
+    gameDebugDetectiveDesc: 'Temukan bug di kode!',
+    gameCounterChallenge: 'Tantangan Counter',
+    gameCounterChallengeDesc: 'Capai angka target!',
+    gameLogicGate: 'Gerbang Logika',
+    gameLogicGateDesc: 'Pelajari logika AND, OR, NOT!',
     
     // Quiz page
     quizTime: 'Waktu Kuis!',
@@ -726,6 +776,40 @@ export const translations = {
     tryAgainVariable: 'Coba lagi! Ikuti setiap langkah.',
     traceCode: 'Telusuri kode dengan hati-hati!',
     tryAgainTrace: 'Coba lagi! Ikuti setiap baris langkah demi langkah.',
+    
+    // String Builder
+    stringBuilder: 'String Builder',
+    combineStrings: 'Gabungkan string bersama!',
+    stringMaster: 'Master String!',
+    youUnderstandStrings: 'Kamu memahami penggabungan string!',
+    whatResultWhenCombine: 'Apa hasilnya jika digabungkan?',
+    tryAgainString: 'Coba lagi! Pikirkan bagaimana string bergabung.',
+    
+    // Debug Detective
+    debugDetective: 'Detektif Debug',
+    findTheBug: 'Temukan bug di kode!',
+    debugMaster: 'Master Debug!',
+    youFoundBug: 'Kamu menemukan bug-nya!',
+    expected: 'Diharapkan',
+    actual: 'Aktual',
+    whichLineHasBug: 'Baris mana yang memiliki bug?',
+    findBug: 'Temukan Bug',
+    
+    // Counter Challenge
+    counterChallenge: 'Tantangan Counter',
+    reachTheTarget: 'Capai angka target!',
+    counterChampion: 'Juara Counter!',
+    reachedTarget: 'Mencapai target dalam',
+    timeUp: 'Waktu Habis!',
+    tryAgainCounter: 'Coba lagi! Lebih cepat lagi ya.',
+    target: 'Target',
+    currentValue: 'Nilai Saat Ini',
+    movesUsed: 'Gerakan digunakan',
+    
+    // Logic Gate
+    logicGate: 'Gerbang Logika',
+    solveLogicGates: 'Selesaikan gerbang logika!',
+    logicMaster: 'Master Logika!',
     
     // Shared game UI
     locked: 'Terkunci',

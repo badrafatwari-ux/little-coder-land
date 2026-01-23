@@ -21,7 +21,7 @@ const STORAGE_KEY = 'programming-for-kids-progress';
 
 // XP needed for each player level
 export const XP_PER_LEVEL = 50;
-export const MAX_PLAYER_LEVEL = 10;
+export const MAX_PLAYER_LEVEL = 12;
 
 // Game unlock requirements (player level needed)
 export const GAME_UNLOCK_LEVELS: Record<string, number> = {
@@ -43,6 +43,10 @@ export const GAME_UNLOCK_LEVELS: Record<string, number> = {
   'operator-quest': 6,
   'typing-code': 6,
   'data-types': 7,
+  'string-builder': 7,
+  'debug-detective': 8,
+  'counter-challenge': 8,
+  'logic-gate': 9,
 };
 
 // Max levels per game
@@ -65,6 +69,10 @@ export const GAME_MAX_LEVELS: Record<string, number> = {
   'operator-quest': 3,
   'typing-code': 3,
   'data-types': 3,
+  'string-builder': 3,
+  'debug-detective': 3,
+  'counter-challenge': 3,
+  'logic-gate': 3,
 };
 
 const defaultProgress: GameProgress = {
