@@ -29,6 +29,10 @@ import { PixelArtGame } from '@/components/games/PixelArtGame';
 import { OperatorQuestGame } from '@/components/games/OperatorQuestGame';
 import { TypingCodeGame } from '@/components/games/TypingCodeGame';
 import { DataTypeGame } from '@/components/games/DataTypeGame';
+import { StringBuilderGame } from '@/components/games/StringBuilderGame';
+import { DebugDetectiveGame } from '@/components/games/DebugDetectiveGame';
+import { CounterChallengeGame } from '@/components/games/CounterChallengeGame';
+import { LogicGateGame } from '@/components/games/LogicGateGame';
 
 interface Game {
   id: string;
@@ -57,6 +61,10 @@ const games: Game[] = [
   { id: 'operator-quest', title: 'Operator Quest', description: 'Find the right operator!', icon: '🧮', difficulty: 'hard' },
   { id: 'typing-code', title: 'Typing Code', description: 'Type code quickly!', icon: '⌨️', difficulty: 'hard' },
   { id: 'data-types', title: 'Data Types', description: 'Identify data types!', icon: '📊', difficulty: 'hard' },
+  { id: 'string-builder', title: 'String Builder', description: 'Combine strings!', icon: '🔤', difficulty: 'hard' },
+  { id: 'debug-detective', title: 'Debug Detective', description: 'Find the bug!', icon: '🔍', difficulty: 'hard' },
+  { id: 'counter-challenge', title: 'Counter Challenge', description: 'Reach the target!', icon: '🎯', difficulty: 'hard' },
+  { id: 'logic-gate', title: 'Logic Gate', description: 'AND, OR, NOT logic!', icon: '🔌', difficulty: 'hard' },
 ];
 
 const Play = () => {
@@ -232,6 +240,14 @@ const GameScreen = ({ game, level, onBack, onLevelChange }: GameScreenProps) => 
       return <TypingCodeGame {...gameProps} />;
     case 'data-types':
       return <DataTypeGame {...gameProps} />;
+    case 'string-builder':
+      return <StringBuilderGame {...gameProps} />;
+    case 'debug-detective':
+      return <DebugDetectiveGame {...gameProps} />;
+    case 'counter-challenge':
+      return <CounterChallengeGame {...gameProps} />;
+    case 'logic-gate':
+      return <LogicGateGame {...gameProps} />;
     default:
       return null;
   }
